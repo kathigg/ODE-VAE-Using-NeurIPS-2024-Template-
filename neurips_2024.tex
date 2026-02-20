@@ -1,733 +1,351 @@
 \documentclass{article}
 
-% if you need to pass options to natbib, use, e.g.:
-%     \PassOptionsToPackage{numbers, compress}{natbib}
-% before loading neurips_2024
-
-
-% ready for submission
 \usepackage{neurips_2024}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{multirow}
 
-
-% to compile a preprint version, e.g., for submission to arXiv, add add the
-% [preprint] option:
-%     \usepackage[preprint]{neurips_2024}
-
-
-% to compile a camera-ready version, add the [final] option, e.g.:
-%     \usepackage[final]{neurips_2024}
-
-
-% to avoid loading the natbib package, add option nonatbib:
-%    \usepackage[nonatbib]{neurips_2024}
-
-
-\usepackage[utf8]{inputenc} % allow utf-8 input
-\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
-\usepackage{hyperref}       % hyperlinks
-\usepackage{url}            % simple URL typesetting
-\usepackage{booktabs}       % professional-quality tables
-\usepackage{amsfonts}       % blackboard math symbols
-\usepackage{nicefrac}       % compact symbols for 1/2, etc.
-\usepackage{microtype}      % microtypography
-\usepackage{xcolor}         % colors
-
-
-\title{Formatting Instructions For NeurIPS 2024}
-
-
-% The \author macro works with any number of authors. There are two commands
-% used to separate the names and addresses of multiple authors: \And and \AND.
-%
-% Using \And between authors leaves it to LaTeX to determine where to break the
-% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
-% authors names on the first line, and the last on the second line, try using
-% \AND instead of \And before the third author name.
-
+\title{A Latent Neural ODE-VAE for Modeling Hippocampal Population Activity on Low-Dimensional Manifolds}
 
 \author{%
-  David S.~Hippocampus\thanks{Use footnote for providing further information
-    about author (webpage, alternative address)---\emph{not} for acknowledging
-    funding agencies.} \\
-  Department of Computer Science\\
-  Cranberry-Lemon University\\
-  Pittsburgh, PA 15213 \\
-  \texttt{hippo@cs.cranberry-lemon.edu} \\
-  % examples of more authors
-  % \And
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
-  % \AND
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
-  % \And
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
-  % \And
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
+  Anonymous Author(s) \\
+  Affiliation \\
+  Address \\
+  \texttt{anonymous@neurips.cc} \\
 }
-
 
 \begin{document}
 
-
 \maketitle
 
-
 \begin{abstract}
-  The abstract paragraph should be indented \nicefrac{1}{2}~inch (3~picas) on
-  both the left- and right-hand margins. Use 10~point type, with a vertical
-  spacing (leading) of 11~points.  The word \textbf{Abstract} must be centered,
-  bold, and in point size 12. Two line spaces precede the abstract. The abstract
-  must be limited to one paragraph.
+Neural activity can be represented as a trajectory in a high-dimensional space where each axis corresponds to one neuron. A central question in systems neuroscience is whether these trajectories are constrained to low-dimensional manifolds that jointly encode external variables and trial-to-trial internal variability. Building on this question, we develop and analyze a latent Neural ODE variational autoencoder (ODE-VAE) for calcium population recordings. The model encodes trial onset activity into a stochastic latent initial condition, evolves it through a continuous-time mixture-of-experts neural ODE, and decodes latent trajectories back to neural activity. Relative to earlier ODE-VAE versions, \texttt{v5} adds transition-aware reconstruction regularization and a soft locally linear embedding (LLE) latent constraint. Using repository-grounded experiments, we report strong reconstruction on synthetic random-foraging data (best seed \(R^2=0.9789\)) and mixed outcomes on the E65 hippocampal dataset, including an archived ODE-VAE run at \(R^2=0.4368\), strict raw-space \texttt{v5} sweeps with best-epoch \(R^2\le 0.0569\), and a no-PCA \texttt{v6} variant at \(R^2=0.0956\). These results show that continuous-time latent manifold models can capture structured dynamics, but evaluation protocol, preprocessing, and regularization balance strongly affect performance on real neural data.
 \end{abstract}
 
-
-\section{Submission of papers to NeurIPS 2024}
-
-
-Please read the instructions below carefully and follow them faithfully.
-
-
-\subsection{Style}
-
-
-Papers to be submitted to NeurIPS 2024 must be prepared according to the
-instructions presented here. Papers may only be up to {\bf nine} pages long,
-including figures. Additional pages \emph{containing only acknowledgments and
-references} are allowed. Papers that exceed the page limit will not be
-reviewed, or in any other way considered for presentation at the conference.
-
-
-The margins in 2024 are the same as those in previous years.
-
-
-Authors are required to use the NeurIPS \LaTeX{} style files obtainable at the
-NeurIPS website as indicated below. Please make sure you use the current files
-and not previous versions. Tweaking the style files may be grounds for
-rejection.
-
-
-\subsection{Retrieval of style files}
-
-
-The style files for NeurIPS and other conference information are available on
-the website at
-\begin{center}
-  \url{http://www.neurips.cc/}
-\end{center}
-The file \verb+neurips_2024.pdf+ contains these instructions and illustrates the
-various formatting requirements your NeurIPS paper must satisfy.
-
-
-The only supported style file for NeurIPS 2024 is \verb+neurips_2024.sty+,
-rewritten for \LaTeXe{}.  \textbf{Previous style files for \LaTeX{} 2.09,
-  Microsoft Word, and RTF are no longer supported!}
-
-
-The \LaTeX{} style file contains three optional arguments: \verb+final+, which
-creates a camera-ready copy, \verb+preprint+, which creates a preprint for
-submission to, e.g., arXiv, and \verb+nonatbib+, which will not load the
-\verb+natbib+ package for you in case of package clash.
-
-
-\paragraph{Preprint option}
-If you wish to post a preprint of your work online, e.g., on arXiv, using the
-NeurIPS style, please use the \verb+preprint+ option. This will create a
-nonanonymized version of your work with the text ``Preprint. Work in progress.''
-in the footer. This version may be distributed as you see fit, as long as you do not say which conference it was submitted to. Please \textbf{do
-  not} use the \verb+final+ option, which should \textbf{only} be used for
-papers accepted to NeurIPS.
-
-
-At submission time, please omit the \verb+final+ and \verb+preprint+
-options. This will anonymize your submission and add line numbers to aid
-review. Please do \emph{not} refer to these line numbers in your paper as they
-will be removed during generation of camera-ready copies.
-
-
-The file \verb+neurips_2024.tex+ may be used as a ``shell'' for writing your
-paper. All you have to do is replace the author, title, abstract, and text of
-the paper with your own.
-
-
-The formatting instructions contained in these style files are summarized in
-Sections \ref{gen_inst}, \ref{headings}, and \ref{others} below.
-
-
-\section{General formatting instructions}
-\label{gen_inst}
-
-
-The text must be confined within a rectangle 5.5~inches (33~picas) wide and
-9~inches (54~picas) long. The left margin is 1.5~inch (9~picas).  Use 10~point
-type with a vertical spacing (leading) of 11~points.  Times New Roman is the
-preferred typeface throughout, and will be selected for you by default.
-Paragraphs are separated by \nicefrac{1}{2}~line space (5.5 points), with no
-indentation.
-
-
-The paper title should be 17~point, initial caps/lower case, bold, centered
-between two horizontal rules. The top rule should be 4~points thick and the
-bottom rule should be 1~point thick. Allow \nicefrac{1}{4}~inch space above and
-below the title to rules. All pages should start at 1~inch (6~picas) from the
-top of the page.
-
-
-For the final version, authors' names are set in boldface, and each name is
-centered above the corresponding address. The lead author's name is to be listed
-first (left-most), and the co-authors' names (if different address) are set to
-follow. If there is only one co-author, list both author and co-author side by
-side.
-
-
-Please pay special attention to the instructions in Section \ref{others}
-regarding figures, tables, acknowledgments, and references.
-
-
-\section{Headings: first level}
-\label{headings}
-
-
-All headings should be lower case (except for first word and proper nouns),
-flush left, and bold.
-
-
-First-level headings should be in 12-point type.
-
-
-\subsection{Headings: second level}
-
-
-Second-level headings should be in 10-point type.
-
-
-\subsubsection{Headings: third level}
-
-
-Third-level headings should be in 10-point type.
-
-
-\paragraph{Paragraphs}
-
-
-There is also a \verb+\paragraph+ command available, which sets the heading in
-bold, flush left, and inline with the text, with the heading followed by 1\,em
-of space.
-
-
-\section{Citations, figures, tables, references}
-\label{others}
-
-
-These instructions apply to everyone.
-
-
-\subsection{Citations within the text}
-
-
-The \verb+natbib+ package will be loaded for you by default.  Citations may be
-author/year or numeric, as long as you maintain internal consistency.  As to the
-format of the references themselves, any style is acceptable as long as it is
-used consistently.
-
-
-The documentation for \verb+natbib+ may be found at
-\begin{center}
-  \url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-\end{center}
-Of note is the command \verb+\citet+, which produces citations appropriate for
-use in inline text.  For example,
-\begin{verbatim}
-   \citet{hasselmo} investigated\dots
-\end{verbatim}
-produces
-\begin{quote}
-  Hasselmo, et al.\ (1995) investigated\dots
-\end{quote}
-
-
-If you wish to load the \verb+natbib+ package with options, you may add the
-following before loading the \verb+neurips_2024+ package:
-\begin{verbatim}
-   \PassOptionsToPackage{options}{natbib}
-\end{verbatim}
-
-
-If \verb+natbib+ clashes with another package you load, you can add the optional
-argument \verb+nonatbib+ when loading the style file:
-\begin{verbatim}
-   \usepackage[nonatbib]{neurips_2024}
-\end{verbatim}
-
-
-As submission is double blind, refer to your own published work in the third
-person. That is, use ``In the previous work of Jones et al.\ [4],'' not ``In our
-previous work [4].'' If you cite your other papers that are not widely available
-(e.g., a journal paper under review), use anonymous author names in the
-citation, e.g., an author of the form ``A.\ Anonymous'' and include a copy of the anonymized paper in the supplementary material.
-
-
-\subsection{Footnotes}
-
-
-Footnotes should be used sparingly.  If you do require a footnote, indicate
-footnotes with a number\footnote{Sample of the first footnote.} in the
-text. Place the footnotes at the bottom of the page on which they appear.
-Precede the footnote with a horizontal rule of 2~inches (12~picas).
-
-
-Note that footnotes are properly typeset \emph{after} punctuation
-marks.\footnote{As in this example.}
-
-
-\subsection{Figures}
-
-
-\begin{figure}
-  \centering
-  \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
-  \caption{Sample figure caption.}
-\end{figure}
-
-
-All artwork must be neat, clean, and legible. Lines should be dark enough for
-purposes of reproduction. The figure number and caption always appear after the
-figure. Place one line space before the figure caption and one line space after
-the figure. The figure caption should be lower case (except for first word and
-proper nouns); figures are numbered consecutively.
-
-
-You may use color figures.  However, it is best for the figure captions and the
-paper body to be legible if the paper is printed in either black/white or in
-color.
-
-
-\subsection{Tables}
-
-
-All tables must be centered, neat, clean and legible.  The table number and
-title always appear before the table.  See Table~\ref{sample-table}.
-
-
-Place one line space before the table title, one line space after the
-table title, and one line space after the table. The table title must
-be lower case (except for first word and proper nouns); tables are
-numbered consecutively.
-
-
-Note that publication-quality tables \emph{do not contain vertical rules.} We
-strongly suggest the use of the \verb+booktabs+ package, which allows for
-typesetting high-quality, professional tables:
-\begin{center}
-  \url{https://www.ctan.org/pkg/booktabs}
-\end{center}
-This package was used to typeset Table~\ref{sample-table}.
-
-
-\begin{table}
-  \caption{Sample table title}
-  \label{sample-table}
-  \centering
-  \begin{tabular}{lll}
-    \toprule
-    \multicolumn{2}{c}{Part}                   \\
-    \cmidrule(r){1-2}
-    Name     & Description     & Size ($\mu$m) \\
-    \midrule
-    Dendrite & Input terminal  & $\sim$100     \\
-    Axon     & Output terminal & $\sim$10      \\
-    Soma     & Cell body       & up to $10^6$  \\
-    \bottomrule
-  \end{tabular}
+\section{Introduction}
+Neural activity can be described as a point in a high-dimensional coordinate system, where each coordinate axis represents a single neuron's activity. Prior work shows that population trajectories often occupy low-dimensional manifolds, in motor cortex, hippocampus, and entorhinal circuits \citep{gallego2017,russo2018,okeefe1971,aronov2017,nieh2021}. This geometric view supports the broader ``cognitive map'' hypothesis: neural circuits organize both physical and abstract knowledge into structured latent spaces \citep{tolman1948,okeefe1978,stachenfeld2017,bellmund2018}.
+
+Recent manifold analyses of hippocampal recordings report intrinsic dimensionalities around 4--6 and show that manifold geometry can explain both task variables and trial-level variability \citep{low2018,chaudhuri2019,nieh2021}. However, many pipelines are multi-stage: fit local transition models, build pairwise distances, embed points, and separately map back to activity \citep{low2018,tenenbaum2000,yu2009}. This decomposition gives useful geometry but does not explicitly enforce globally smooth continuous-time dynamics in a single end-to-end objective.
+
+This paper develops a continuous-time generative alternative tailored to the repository's ODE-VAE codebase. Starting from an initial latent ODE-VAE, we focus on \texttt{v5}, which adds (i) a mixture-of-experts (MoE) latent vector field, (ii) transition-aware reconstruction regularization, and (iii) soft LLE regularization in latent space. We evaluate this family on synthetic and real hippocampal calcium data and document where the method works and where it fails.
+
+\paragraph{Contributions.}
+\begin{itemize}
+\item We present a mathematically explicit latent Neural ODE-VAE formulation for trial-based neural population sequences, including MoE latent dynamics and local-geometric regularizers.
+\item We instantiate this formulation using the repository's \texttt{v1--v6} implementations, with \texttt{v5} as the main model and \texttt{v6} as a no-PCA extension.
+\item We provide artifact-grounded empirical analysis on synthetic and E65 datasets, including seed sensitivity and configuration-dependent instability.
+\item We identify concrete protocol factors (split strategy, landmark subsampling, and metric space) that materially influence reported \(R^2\).
+\end{itemize}
+
+\section{Related Work}
+Our approach sits at the intersection of hippocampal manifold neuroscience and deep latent dynamical systems. In neuroscience, place cells and cognitive map theories motivate low-dimensional geometric structure in population activity \citep{okeefe1971,okeefe1978,eichenbaum2014}. More recent work extends these ideas to abstract and non-spatial variables \citep{constantinescu2016,schuck2019,park2020,aronov2017,nieh2021}. Population-level manifold analyses in hippocampus and other circuits show that latent geometry can explain behavior and internal state variability \citep{low2018,chaudhuri2019,gallego2017}.
+
+In machine learning, variational autoencoders \citep{kingma2014} and neural ODEs \citep{chen2018} enable continuous-time latent-variable models, including latent ODEs for irregular trajectories \citep{rubanova2019}. Our model adopts this framework but targets neuroscientific interpretability: trialized sequences, manifold visualizations, and explicit regularizers for smoothness, transition consistency, and local linearity.
+
+\section{Problem Setup and Data}
+Let \(x_b(t_\ell) \in \mathbb{R}^{N}\) denote population activity for trial \(b\in\{1,\dots,B\}\) at resampled time index \(\ell\in\{1,\dots,L\}\).
+
+\paragraph{E65 dataset.}
+The repository's main real dataset is \texttt{E65\_data.npz}, containing calcium activity \((N=375,\ T=7434)\), trial IDs, timestamps, and aligned behavioral covariates. In the \texttt{v5} preprocessing path: (i) PCA retains 95\% variance, producing \(K=129\) components; (ii) trials are resampled to \(L=120\) bins using \texttt{trial\_len\_s=12} and \texttt{fps=10}; (iii) first 10 trials are dropped, yielding 180 usable trials; (iv) default validation holds out 3 trials (train 177 / val 3).
+
+\paragraph{Synthetic benchmark.}
+The repository also includes \texttt{synthetic\_rat\_data.npz} (4000 frames, 300 neurons, 20 trials), used to test recoverability of smooth low-dimensional dynamics under controlled conditions.
+
+\section{Model: Latent Neural ODE-VAE}
+\subsection{Stochastic encoder}
+For each trial, the encoder uses only \(x_b(t_1)\) and outputs a diagonal Gaussian posterior on the latent initial state:
+\begin{equation}
+q_\phi(z_{0,b} \mid x_b(t_1)) = \mathcal{N}\!\left(\mu_b,\operatorname{diag}(\sigma_b^2)\right),
+\end{equation}
+with reparameterization
+\begin{equation}
+z_{0,b} = \mu_b + \sigma_b \odot \epsilon, \qquad \epsilon \sim \mathcal{N}(0, I).
+\end{equation}
+
+\subsection{Continuous-time latent dynamics}
+Latent trajectories are generated by a neural ODE:
+\begin{equation}
+\frac{dz_b(t)}{dt} = f_\theta(z_b(t), t), \qquad z_b(t_1)=z_{0,b}.
+\end{equation}
+In \texttt{v5}, \(f_\theta\) is a mixture of experts:
+\begin{equation}
+f_\theta(z,t) = \sum_{e=1}^{E} \pi_e(z) f_e(z), \qquad
+\pi(z)=\operatorname{softmax}(g(z)),
+\end{equation}
+with \(E=4\) latent experts by default and Dormand--Prince integration (\texttt{dopri5}).
+
+\subsection{Decoder family}
+A decoder maps latent states back to observations:
+\begin{equation}
+\hat{x}_b(t_\ell)=g_\psi(z_b(t_\ell)).
+\end{equation}
+The codebase supports MLP, neuron-aware, local-attention, and MoE decoders; \texttt{v5} default is MoE decoder with 8 decoder experts.
+
+\section{Training Objective and Regularization}
+The base objective combines reconstruction and KL terms:
+\begin{equation}
+\mathcal{L}_{\text{base}} = \mathcal{L}_{\text{rec}} + \beta\,\mathcal{L}_{\text{KL}},
+\end{equation}
+where
+\begin{equation}
+\mathcal{L}_{\text{rec}} = \frac{1}{BLK}\sum_{b,\ell}\|\hat{x}_b(t_\ell)-x_b(t_\ell)\|_2^2,
+\end{equation}
+\begin{equation}
+\mathcal{L}_{\text{KL}} = \frac{1}{B}\sum_b D_{\text{KL}}\big(q_\phi(z_{0,b}\mid x_b(t_1))\,\|\,\mathcal{N}(0,I)\big).
+\end{equation}
+
+\paragraph{Smoothness regularization.}
+\begin{equation}
+\mathcal{L}_{\text{smooth}} = \frac{1}{B(L-1)D}\sum_{b,\ell}
+\left\|\frac{z_b(t_{\ell+1})-z_b(t_\ell)}{t_{\ell+1}-t_\ell}\right\|_2^2.
+\end{equation}
+
+\paragraph{Transition-aware regularization (\texttt{v5}).}
+\begin{equation}
+\mathcal{L}_{\text{trans}} = \frac{1}{B(L-1)K}\sum_{b,\ell}
+\left\|\big(\hat{x}_b(t_{\ell+1})-\hat{x}_b(t_\ell)\big)-\big(x_b(t_{\ell+1})-x_b(t_\ell)\big)\right\|_2^2.
+\end{equation}
+This term is linearly warmed up for the first 30 epochs.
+
+\paragraph{Soft LLE latent regularization (\texttt{v5}).}
+For flattened latent points \(\{z_i\}_{i=1}^M\), with \(k\)-NN set \(\mathcal{N}_k(i)\):
+\begin{equation}
+\mathcal{L}_{\text{LLE}} = \frac{1}{M}\sum_{i=1}^{M}
+\left\|z_i-\sum_{j\in\mathcal{N}_k(i)}w_{ij}z_j\right\|_2^2,
+\quad
+w_{ij}\propto\exp\!\left(-\frac{\|z_i-z_j\|_2}{\tau}\right).
+\end{equation}
+Default parameters: \(k=8\), \(M\le 256\), \(\tau=0.1\).
+
+\paragraph{Total loss.}
+\begin{equation}
+\mathcal{L} = \mathcal{L}_{\text{rec}} + \beta_t\mathcal{L}_{\text{KL}} +
+\lambda_{\text{smooth}}\mathcal{L}_{\text{smooth}} +
+\lambda_{\text{trans},t}\mathcal{L}_{\text{trans}} +
+\lambda_{\text{LLE}}\mathcal{L}_{\text{LLE}}.
+\end{equation}
+The KL coefficient \(\beta_t\) is warmed up over 30 epochs to a final value \(\beta=0.02\).
+
+\section{Experimental Protocol}
+\subsection{Configurations}
+Main \texttt{v5} settings from \texttt{config.txt}: latent dimension 5 (with sweep to 8), batch size 8, 150 epochs, Adam optimizer (learning rate 0.002, weight decay \(10^{-5}\)), \(\lambda_{\text{smooth}}\in\{5\times10^{-4},2\times10^{-4}\}\), \(\lambda_{\text{trans}}=0.01\), \(\lambda_{\text{LLE}}=0.01\), landmark count 100, and baseline correction enabled.
+
+\subsection{Metrics}
+The primary training metric is coefficient of determination,
+\begin{equation}
+R^2 = 1-\frac{\sum (X-\hat{X})^2}{\sum (X-\bar{X})^2}.
+\end{equation}
+The repository contains two evaluation styles: (i) PCA-space \(R^2\) and (ii) strict raw-neuron-space \(R^2\) via inverse PCA and de-normalization. We report artifact values as stored in each run metadata file.
+
+\section{Results}
+\subsection{Synthetic benchmark: high ceiling with seed sensitivity}
+Table~\ref{tab:synthetic} summarizes the repository seed sweep on synthetic data. Best seed reaches \(R^2=0.9789\), but one seed collapses to NaN/0.0, indicating optimizer sensitivity.
+
+\begin{table}[t]
+\centering
+\caption{Synthetic random-foraging benchmark from \texttt{seed\_sweep\_results.txt}.}
+\label{tab:synthetic}
+\begin{tabular}{lcc}
+\toprule
+Seed & Final \(R^2\) & Best validation loss \\
+\midrule
+1 & 0.9789 & 0.06642 \\
+42 & 0.6757 & 0.40521 \\
+1337 & 0.9116 & 0.16298 \\
+2025 & 0.7467 & 0.31145 \\
+777 & 0.0000 (NaN collapse) & $\infty$ \\
+\midrule
+Mean (all seeds) & 0.6626 & -- \\
+Mean (non-collapsed seeds) & 0.8282 & -- \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-\subsection{Math}
-Note that display math in bare TeX commands will not create correct line numbers for submission. Please use LaTeX (or AMSTeX) commands for unnumbered display math. (You really shouldn't be using \$\$ anyway; see \url{https://tex.stackexchange.com/questions/503/why-is-preferable-to} and \url{https://tex.stackexchange.com/questions/40492/what-are-the-differences-between-align-equation-and-displaymath} for more information.)
+\subsection{E65 hippocampal data: mixed performance across variants}
+Table~\ref{tab:e65} reports all E65 artifact metrics found in the repository for the ODE-VAE family. An archived ODE-VAE run reports \(R^2=0.4368\). Strict raw-space \texttt{v5} sweep artifacts are substantially lower (best-epoch \(R^2\le 0.0569\), negative final \(R^2\) in three runs), while \texttt{v6} (no PCA) records \(R^2=0.0956\).
 
-\subsection{Final instructions}
+\begin{table}[t]
+\centering
+\caption{E65 run artifacts from saved metadata/checkpoints.}
+\label{tab:e65}
+\begin{tabular}{lccc}
+\toprule
+Artifact (path) & Variant summary & Best reported \(R^2\) & Final reported \(R^2\) \\
+\midrule
+\texttt{runs/ode\_vae\_E65/run\_metadata.json} & archived ODE-VAE & -- & 0.4368 \\
+\texttt{runs/ode\_vae\_E65/ld5\_b0.02\_ls0.0005/run\_metadata.json} & \texttt{v5}, \(d=5\) & 0.0354 & -0.2391 \\
+\texttt{runs/ode\_vae\_E65/ld5\_b0.02\_ls0.0002/run\_metadata.json} & \texttt{v5}, \(d=5\) & 0.0353 & -0.1382 \\
+\texttt{runs/ode\_vae\_E65/ld8\_b0.02\_ls0.0005/run\_metadata.json} & \texttt{v5}, \(d=8\) & 0.0569 & -0.2022 \\
+\texttt{src/pt\_files/final\_metrics.pt} & \texttt{v6}, no PCA & -- & 0.0956 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Do not change any aspects of the formatting parameters in the style files.  In
-particular, do not modify the width or length of the rectangle the text should
-fit into, and do not change font sizes (except perhaps in the
-\textbf{References} section; see below). Please note that pages should be
-numbered.
+\subsection{Manifold interpretability}
+The codebase saves latent manifold projections (MDS) and reconstruction diagnostics for each run. Figure~\ref{fig:manifold} shows an example latent trajectory embedding from the trained model artifacts.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\linewidth]{neuroscience/src/pt_files/latent_manifold_mds.png}
+\caption{Latent manifold embedding produced by the ODE-VAE analysis pipeline.}
+\label{fig:manifold}
+\end{figure}
 
-\section{Preparing PDF files}
+\section{Discussion}
+The model captures the intended inductive bias: low-dimensional continuous latent trajectories with explicit geometric regularization. On synthetic data, this bias is highly effective. On real E65 recordings, however, results are sensitive to implementation and evaluation choices.
 
-
-Please prepare submission files with paper size ``US Letter,'' and not, for
-example, ``A4.''
-
-
-Fonts were the main cause of problems in the past years. Your PDF file must only
-contain Type 1 or Embedded TrueType fonts. Here are a few instructions to
-achieve this.
-
-
-\begin{itemize}
-
-
-\item You should directly generate PDF files using \verb+pdflatex+.
-
-
-\item You can check which fonts a PDF files uses.  In Acrobat Reader, select the
-  menu Files$>$Document Properties$>$Fonts and select Show All Fonts. You can
-  also use the program \verb+pdffonts+ which comes with \verb+xpdf+ and is
-  available out-of-the-box on most Linux machines.
-
-
-\item \verb+xfig+ "patterned" shapes are implemented with bitmap fonts.  Use
-  "solid" shapes instead.
-
-
-\item The \verb+\bbold+ package almost always uses bitmap fonts.  You should use
-  the equivalent AMS Fonts:
-\begin{verbatim}
-   \usepackage{amsfonts}
-\end{verbatim}
-followed by, e.g., \verb+\mathbb{R}+, \verb+\mathbb{N}+, or \verb+\mathbb{C}+
-for $\mathbb{R}$, $\mathbb{N}$ or $\mathbb{C}$.  You can also use the following
-workaround for reals, natural and complex:
-\begin{verbatim}
-   \newcommand{\RR}{I\!\!R} %real numbers
-   \newcommand{\Nat}{I\!\!N} %natural numbers
-   \newcommand{\CC}{I\!\!\!\!C} %complex numbers
-\end{verbatim}
-Note that \verb+amsfonts+ is automatically loaded by the \verb+amssymb+ package.
-
-
-\end{itemize}
-
-
-If your file contains type 3 fonts or non embedded TrueType fonts, we will ask
-you to fix it.
-
-
-\subsection{Margins in \LaTeX{}}
-
-
-Most of the margin problems come from figures positioned by hand using
-\verb+\special+ or other commands. We suggest using the command
-\verb+\includegraphics+ from the \verb+graphicx+ package. Always specify the
-figure width as a multiple of the line width as in the example below:
-\begin{verbatim}
-   \usepackage[pdftex]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]{myfile.pdf}
-\end{verbatim}
-See Section 4.4 in the graphics bundle documentation
-(\url{http://mirrors.ctan.org/macros/latex/required/graphics/grfguide.pdf})
-
-
-A number of width problems arise when \LaTeX{} cannot properly hyphenate a
-line. Please give LaTeX hyphenation hints using the \verb+\-+ command when
-necessary.
-
-\begin{ack}
-Use unnumbered first level headings for the acknowledgments. All acknowledgments
-go at the end of the paper before the list of references. Moreover, you are required to declare
-funding (financial activities supporting the submitted work) and competing interests (related financial activities outside the submitted work).
-More information about this disclosure can be found at: \url{https://neurips.cc/Conferences/2024/PaperInformation/FundingDisclosure}.
-
-
-Do {\bf not} include this section in the anonymized submission, only in the final paper. You can use the \texttt{ack} environment provided in the style file to automatically hide this section in the anonymized submission.
-\end{ack}
-
-\section*{References}
-
-
-References follow the acknowledgments in the camera-ready paper. Use unnumbered first-level heading for
-the references. Any choice of citation style is acceptable as long as you are
-consistent. It is permissible to reduce the font size to \verb+small+ (9 point)
-when listing the references.
-Note that the Reference section does not count towards the page limit.
-\medskip
-
-
-{
-\small
-
-
-[1] Alexander, J.A.\ \& Mozer, M.C.\ (1995) Template-based algorithms for
-connectionist rule extraction. In G.\ Tesauro, D.S.\ Touretzky and T.K.\ Leen
-(eds.), {\it Advances in Neural Information Processing Systems 7},
-pp.\ 609--616. Cambridge, MA: MIT Press.
-
-
-[2] Bower, J.M.\ \& Beeman, D.\ (1995) {\it The Book of GENESIS: Exploring
-  Realistic Neural Models with the GEneral NEural SImulation System.}  New York:
-TELOS/Springer--Verlag.
-
-
-[3] Hasselmo, M.E., Schnell, E.\ \& Barkai, E.\ (1995) Dynamics of learning and
-recall at excitatory recurrent synapses and cholinergic modulation in rat
-hippocampal region CA3. {\it Journal of Neuroscience} {\bf 15}(7):5249-5262.
-}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\appendix
-
-\section{Appendix / supplemental material}
-
-
-Optionally include supplemental material (complete proofs, additional experiments and plots) in appendix.
-All such materials \textbf{SHOULD be included in the main submission.}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\newpage
-\section*{NeurIPS Paper Checklist}
-
-%%% BEGIN INSTRUCTIONS %%%
-The checklist is designed to encourage best practices for responsible machine learning research, addressing issues of reproducibility, transparency, research ethics, and societal impact. Do not remove the checklist: {\bf The papers not including the checklist will be desk rejected.} The checklist should follow the references and follow the (optional) supplemental material.  The checklist does NOT count towards the page
-limit. 
-
-Please read the checklist guidelines carefully for information on how to answer these questions. For each question in the checklist:
-\begin{itemize}
-    \item You should answer \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item \answerNA{} means either that the question is Not Applicable for that particular paper or the relevant information is Not Available.
-    \item Please provide a short (1–2 sentence) justification right after your answer (even for NA). 
-   % \item {\bf The papers not including the checklist will be desk rejected.}
-\end{itemize}
-
-{\bf The checklist answers are an integral part of your paper submission.} They are visible to the reviewers, area chairs, senior area chairs, and ethics reviewers. You will be asked to also include it (after eventual revisions) with the final version of your paper, and its final version will be published with the paper.
-
-The reviewers of your paper will be asked to use the checklist as one of the factors in their evaluation. While "\answerYes{}" is generally preferable to "\answerNo{}", it is perfectly acceptable to answer "\answerNo{}" provided a proper justification is given (e.g., "error bars are not reported because it would be too computationally expensive" or "we were unable to find the license for the dataset we used"). In general, answering "\answerNo{}" or "\answerNA{}" is not grounds for rejection. While the questions are phrased in a binary way, we acknowledge that the true answer is often more nuanced, so please just use your best judgment and write a justification to elaborate. All supporting evidence can appear either in the main paper or the supplemental material, provided in appendix. If you answer \answerYes{} to a question, in the justification please point to the section(s) where related material for the question can be found.
-
-IMPORTANT, please:
-\begin{itemize}
-    \item {\bf Delete this instruction block, but keep the section heading ``NeurIPS paper checklist"},
-    \item  {\bf Keep the checklist subsection headings, questions/answers and guidelines below.}
-    \item {\bf Do not modify the questions and only use the provided macros for your answers}.
-\end{itemize} 
- 
-
-%%% END INSTRUCTIONS %%%
-
-
+Three factors emerge from the repository artifacts:
 \begin{enumerate}
-
-\item {\bf Claims}
-    \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the abstract and introduction do not include the claims made in the paper.
-        \item The abstract and/or introduction should clearly state the claims made, including the contributions made in the paper and important assumptions and limitations. A No or NA answer to this question will not be perceived well by the reviewers. 
-        \item The claims made should match theoretical and experimental results, and reflect how much the results can be expected to generalize to other settings. 
-        \item It is fine to include aspirational goals as motivation as long as it is clear that these goals are not attained by the paper. 
-    \end{itemize}
-
-\item {\bf Limitations}
-    \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper has no limitation while the answer No means that the paper has limitations, but those are not discussed in the paper. 
-        \item The authors are encouraged to create a separate "Limitations" section in their paper.
-        \item The paper should point out any strong assumptions and how robust the results are to violations of these assumptions (e.g., independence assumptions, noiseless settings, model well-specification, asymptotic approximations only holding locally). The authors should reflect on how these assumptions might be violated in practice and what the implications would be.
-        \item The authors should reflect on the scope of the claims made, e.g., if the approach was only tested on a few datasets or with a few runs. In general, empirical results often depend on implicit assumptions, which should be articulated.
-        \item The authors should reflect on the factors that influence the performance of the approach. For example, a facial recognition algorithm may perform poorly when image resolution is low or images are taken in low lighting. Or a speech-to-text system might not be used reliably to provide closed captions for online lectures because it fails to handle technical jargon.
-        \item The authors should discuss the computational efficiency of the proposed algorithms and how they scale with dataset size.
-        \item If applicable, the authors should discuss possible limitations of their approach to address problems of privacy and fairness.
-        \item While the authors might fear that complete honesty about limitations might be used by reviewers as grounds for rejection, a worse outcome might be that reviewers discover limitations that aren't acknowledged in the paper. The authors should use their best judgment and recognize that individual actions in favor of transparency play an important role in developing norms that preserve the integrity of the community. Reviewers will be specifically instructed to not penalize honesty concerning limitations.
-    \end{itemize}
-
-\item {\bf Theory Assumptions and Proofs}
-    \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not include theoretical results. 
-        \item All the theorems, formulas, and proofs in the paper should be numbered and cross-referenced.
-        \item All assumptions should be clearly stated or referenced in the statement of any theorems.
-        \item The proofs can either appear in the main paper or the supplemental material, but if they appear in the supplemental material, the authors are encouraged to provide a short proof sketch to provide intuition. 
-        \item Inversely, any informal proof provided in the core of the paper should be complemented by formal proofs provided in appendix or supplemental material.
-        \item Theorems and Lemmas that the proof relies upon should be properly referenced. 
-    \end{itemize}
-
-    \item {\bf Experimental Result Reproducibility}
-    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not include experiments.
-        \item If the paper includes experiments, a No answer to this question will not be perceived well by the reviewers: Making the paper reproducible is important, regardless of whether the code and data are provided or not.
-        \item If the contribution is a dataset and/or model, the authors should describe the steps taken to make their results reproducible or verifiable. 
-        \item Depending on the contribution, reproducibility can be accomplished in various ways. For example, if the contribution is a novel architecture, describing the architecture fully might suffice, or if the contribution is a specific model and empirical evaluation, it may be necessary to either make it possible for others to replicate the model with the same dataset, or provide access to the model. In general. releasing code and data is often one good way to accomplish this, but reproducibility can also be provided via detailed instructions for how to replicate the results, access to a hosted model (e.g., in the case of a large language model), releasing of a model checkpoint, or other means that are appropriate to the research performed.
-        \item While NeurIPS does not require releasing code, the conference does require all submissions to provide some reasonable avenue for reproducibility, which may depend on the nature of the contribution. For example
-        \begin{enumerate}
-            \item If the contribution is primarily a new algorithm, the paper should make it clear how to reproduce that algorithm.
-            \item If the contribution is primarily a new model architecture, the paper should describe the architecture clearly and fully.
-            \item If the contribution is a new model (e.g., a large language model), then there should either be a way to access this model for reproducing the results or a way to reproduce the model (e.g., with an open-source dataset or instructions for how to construct the dataset).
-            \item We recognize that reproducibility may be tricky in some cases, in which case authors are welcome to describe the particular way they provide for reproducibility. In the case of closed-source models, it may be that access to the model is limited in some way (e.g., to registered users), but it should be possible for other researchers to have some path to reproducing or verifying the results.
-        \end{enumerate}
-    \end{itemize}
-
-
-\item {\bf Open access to data and code}
-    \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that paper does not include experiments requiring code.
-        \item Please see the NeurIPS code and data submission guidelines (\url{https://nips.cc/public/guides/CodeSubmissionPolicy}) for more details.
-        \item While we encourage the release of code and data, we understand that this might not be possible, so “No” is an acceptable answer. Papers cannot be rejected simply for not including code, unless this is central to the contribution (e.g., for a new open-source benchmark).
-        \item The instructions should contain the exact command and environment needed to run to reproduce the results. See the NeurIPS code and data submission guidelines (\url{https://nips.cc/public/guides/CodeSubmissionPolicy}) for more details.
-        \item The authors should provide instructions on data access and preparation, including how to access the raw data, preprocessed data, intermediate data, and generated data, etc.
-        \item The authors should provide scripts to reproduce all experimental results for the new proposed method and baselines. If only a subset of experiments are reproducible, they should state which ones are omitted from the script and why.
-        \item At submission time, to preserve anonymity, the authors should release anonymized versions (if applicable).
-        \item Providing as much information as possible in supplemental material (appended to the paper) is recommended, but including URLs to data and code is permitted.
-    \end{itemize}
-
-
-\item {\bf Experimental Setting/Details}
-    \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer, etc.) necessary to understand the results?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not include experiments.
-        \item The experimental setting should be presented in the core of the paper to a level of detail that is necessary to appreciate the results and make sense of them.
-        \item The full details can be provided either with the code, in appendix, or as supplemental material.
-    \end{itemize}
-
-\item {\bf Experiment Statistical Significance}
-    \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not include experiments.
-        \item The authors should answer "Yes" if the results are accompanied by error bars, confidence intervals, or statistical significance tests, at least for the experiments that support the main claims of the paper.
-        \item The factors of variability that the error bars are capturing should be clearly stated (for example, train/test split, initialization, random drawing of some parameter, or overall run with given experimental conditions).
-        \item The method for calculating the error bars should be explained (closed form formula, call to a library function, bootstrap, etc.)
-        \item The assumptions made should be given (e.g., Normally distributed errors).
-        \item It should be clear whether the error bar is the standard deviation or the standard error of the mean.
-        \item It is OK to report 1-sigma error bars, but one should state it. The authors should preferably report a 2-sigma error bar than state that they have a 96\% CI, if the hypothesis of Normality of errors is not verified.
-        \item For asymmetric distributions, the authors should be careful not to show in tables or figures symmetric error bars that would yield results that are out of range (e.g. negative error rates).
-        \item If error bars are reported in tables or plots, The authors should explain in the text how they were calculated and reference the corresponding figures or tables in the text.
-    \end{itemize}
-
-\item {\bf Experiments Compute Resources}
-    \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not include experiments.
-        \item The paper should indicate the type of compute workers CPU or GPU, internal cluster, or cloud provider, including relevant memory and storage.
-        \item The paper should provide the amount of compute required for each of the individual experimental runs as well as estimate the total compute. 
-        \item The paper should disclose whether the full research project required more compute than the experiments reported in the paper (e.g., preliminary or failed experiments that didn't make it into the paper). 
-    \end{itemize}
-    
-\item {\bf Code Of Ethics}
-    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics \url{https://neurips.cc/public/EthicsGuidelines}?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the authors have not reviewed the NeurIPS Code of Ethics.
-        \item If the authors answer No, they should explain the special circumstances that require a deviation from the Code of Ethics.
-        \item The authors should make sure to preserve anonymity (e.g., if there is a special consideration due to laws or regulations in their jurisdiction).
-    \end{itemize}
-
-
-\item {\bf Broader Impacts}
-    \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that there is no societal impact of the work performed.
-        \item If the authors answer NA or No, they should explain why their work has no societal impact or why the paper does not address societal impact.
-        \item Examples of negative societal impacts include potential malicious or unintended uses (e.g., disinformation, generating fake profiles, surveillance), fairness considerations (e.g., deployment of technologies that could make decisions that unfairly impact specific groups), privacy considerations, and security considerations.
-        \item The conference expects that many papers will be foundational research and not tied to particular applications, let alone deployments. However, if there is a direct path to any negative applications, the authors should point it out. For example, it is legitimate to point out that an improvement in the quality of generative models could be used to generate deepfakes for disinformation. On the other hand, it is not needed to point out that a generic algorithm for optimizing neural networks could enable people to train models that generate Deepfakes faster.
-        \item The authors should consider possible harms that could arise when the technology is being used as intended and functioning correctly, harms that could arise when the technology is being used as intended but gives incorrect results, and harms following from (intentional or unintentional) misuse of the technology.
-        \item If there are negative societal impacts, the authors could also discuss possible mitigation strategies (e.g., gated release of models, providing defenses in addition to attacks, mechanisms for monitoring misuse, mechanisms to monitor how a system learns from feedback over time, improving the efficiency and accessibility of ML).
-    \end{itemize}
-    
-\item {\bf Safeguards}
-    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pretrained language models, image generators, or scraped datasets)?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper poses no such risks.
-        \item Released models that have a high risk for misuse or dual-use should be released with necessary safeguards to allow for controlled use of the model, for example by requiring that users adhere to usage guidelines or restrictions to access the model or implementing safety filters. 
-        \item Datasets that have been scraped from the Internet could pose safety risks. The authors should describe how they avoided releasing unsafe images.
-        \item We recognize that providing effective safeguards is challenging, and many papers do not require this, but we encourage authors to take this into account and make a best faith effort.
-    \end{itemize}
-
-\item {\bf Licenses for existing assets}
-    \item[] Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not use existing assets.
-        \item The authors should cite the original paper that produced the code package or dataset.
-        \item The authors should state which version of the asset is used and, if possible, include a URL.
-        \item The name of the license (e.g., CC-BY 4.0) should be included for each asset.
-        \item For scraped data from a particular source (e.g., website), the copyright and terms of service of that source should be provided.
-        \item If assets are released, the license, copyright information, and terms of use in the package should be provided. For popular datasets, \url{paperswithcode.com/datasets} has curated licenses for some datasets. Their licensing guide can help determine the license of a dataset.
-        \item For existing datasets that are re-packaged, both the original license and the license of the derived asset (if it has changed) should be provided.
-        \item If this information is not available online, the authors are encouraged to reach out to the asset's creators.
-    \end{itemize}
-
-\item {\bf New Assets}
-    \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not release new assets.
-        \item Researchers should communicate the details of the dataset/code/model as part of their submissions via structured templates. This includes details about training, license, limitations, etc. 
-        \item The paper should discuss whether and how consent was obtained from people whose asset is used.
-        \item At submission time, remember to anonymize your assets (if applicable). You can either create an anonymized URL or include an anonymized zip file.
-    \end{itemize}
-
-\item {\bf Crowdsourcing and Research with Human Subjects}
-    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)? 
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not involve crowdsourcing nor research with human subjects.
-        \item Including this information in the supplemental material is fine, but if the main contribution of the paper involves human subjects, then as much detail as possible should be included in the main paper. 
-        \item According to the NeurIPS Code of Ethics, workers involved in data collection, curation, or other labor should be paid at least the minimum wage in the country of the data collector. 
-    \end{itemize}
-
-\item {\bf Institutional Review Board (IRB) Approvals or Equivalent for Research with Human Subjects}
-    \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not involve crowdsourcing nor research with human subjects.
-        \item Depending on the country in which research is conducted, IRB approval (or equivalent) may be required for any human subjects research. If you obtained IRB approval, you should clearly state this in the paper. 
-        \item We recognize that the procedures for this may vary significantly between institutions and locations, and we expect authors to adhere to the NeurIPS Code of Ethics and the guidelines for their institution. 
-        \item For initial submissions, do not include any information that would break anonymity (if applicable), such as the institution conducting the review.
-    \end{itemize}
-
+\item \textbf{Metric-space mismatch.} PCA-space training can look favorable while strict raw-space \(R^2\) may degrade.
+\item \textbf{Data-efficiency tradeoff.} Landmark subsampling (100 selected sequences from 180 usable trials) accelerates training but may reduce generalization.
+\item \textbf{Optimization stability.} Strong regularization with small validation sets (3 trials) and stiff latent dynamics can produce unstable or negative final \(R^2\), despite early high points.
 \end{enumerate}
 
+These observations suggest that future gains likely require protocol-level changes in addition to architectural changes: larger and randomized holdout splits, early stopping on a stable cross-validated objective, trial-level (not frame-level) landmark selection, and direct raw-space reconstruction losses.
+
+\section{Limitations and Reproducibility}
+This study is bounded by available run artifacts in the repository and inherits version-specific logging differences. In particular, some run files report ``best'' and ``final'' \(R^2\) under different conditions, and not all checkpoints include identical metadata fields. We therefore report values exactly as saved in each artifact path. The codebase also indicates unresolved training fragility (including occasional NaN collapse), which should be addressed before definitive biological claims.
+
+\section{Conclusion}
+We presented a mathematically grounded latent Neural ODE-VAE framework for neural manifold modeling and analyzed the repository's \texttt{v1--v6} trajectory with \texttt{v5} as the primary model. The method can recover smooth low-dimensional dynamics and high synthetic reconstruction quality, but real-data performance remains sensitive to preprocessing and evaluation protocol. This work provides a formalized foundation and a clear set of engineering directions for turning ODE-VAE manifold modeling into a robust neuroscience analysis tool.
+
+\paragraph{Societal impact.}
+This work is basic research on neural representation learning from animal neuroscience data and has no immediate direct societal deployment. Potential long-term impact is improved scientific understanding of memory and cognition.
+
+\bibliographystyle{plainnat}
+\begin{thebibliography}{99}
+
+\bibitem[Aronov et~al.(2017)Aronov, Nevers, and Tank]{aronov2017}
+Dmitriy Aronov, Rachel Nevers, and David W Tank.
+\newblock Mapping of a non-spatial dimension by the hippocampal-entorhinal circuit.
+\newblock \emph{Nature}, 543:719--722, 2017.
+
+\bibitem[Bellmund et~al.(2018)Bellmund, Gardenfors, Moser, and Doeller]{bellmund2018}
+Jacob L~S Bellmund, Peter Gardenfors, Edvard~I Moser, and Christian~F Doeller.
+\newblock Navigating cognition: Spatial codes for human thinking.
+\newblock \emph{Science}, 362:eaat6766, 2018.
+
+\bibitem[Chaudhuri et~al.(2019)Chaudhuri, Gercek, Pandey, Peyrache, and Fiete]{chaudhuri2019}
+Rishidev Chaudhuri, Burak Gercek, Bikash Pandey, Adrien Peyrache, and Ila Fiete.
+\newblock The intrinsic attractor manifold and population dynamics of a canonical cognitive circuit across waking and sleep.
+\newblock \emph{Nature Neuroscience}, 22:1512--1520, 2019.
+
+\bibitem[Chen et~al.(2018)Chen, Rubanova, Bettencourt, and Duvenaud]{chen2018}
+Ricky~TQ Chen, Yulia Rubanova, Jesse Bettencourt, and David Duvenaud.
+\newblock Neural ordinary differential equations.
+\newblock \emph{NeurIPS}, 2018.
+
+\bibitem[Constantinescu et~al.(2016)Constantinescu, O'Reilly, and Behrens]{constantinescu2016}
+Alexandra~O Constantinescu, Jill~X O'Reilly, and Timothy~EJ Behrens.
+\newblock Organizing conceptual knowledge in humans with a grid-like code.
+\newblock \emph{Science}, 352:1464--1468, 2016.
+
+\bibitem[Eichenbaum and Cohen(2014)]{eichenbaum2014}
+Howard Eichenbaum and Neal~J Cohen.
+\newblock Can we reconcile the declarative memory and spatial navigation views on hippocampal function?
+\newblock \emph{Neuron}, 83:764--770, 2014.
+
+\bibitem[Gallego et~al.(2017)Gallego, Perich, Miller, and Solla]{gallego2017}
+Juan~A Gallego, Matthew~G Perich, Lee~E Miller, and Sara~A Solla.
+\newblock Neural manifolds for the control of movement.
+\newblock \emph{Neuron}, 94:978--984, 2017.
+
+\bibitem[Kingma and Welling(2014)]{kingma2014}
+Diederik~P Kingma and Max Welling.
+\newblock Auto-encoding variational bayes.
+\newblock \emph{ICLR}, 2014.
+
+\bibitem[Low et~al.(2018)Low, Lewallen, Aronov, Nevers, and Tank]{low2018}
+Ryan~J Low, Sean Lewallen, Dmitriy Aronov, Rachel Nevers, and David~W Tank.
+\newblock Probing variability in a cognitive map using manifold inference from neural dynamics.
+\newblock \emph{bioRxiv}, 2018.
+
+\bibitem[MacDonald et~al.(2011)MacDonald, Lepage, Eden, and Eichenbaum]{macdonald2011}
+Christopher~J MacDonald, Kyle~Q Lepage, Uri~T Eden, and Howard Eichenbaum.
+\newblock Hippocampal time cells bridge the gap in memory for discontiguous events.
+\newblock \emph{Neuron}, 71:737--749, 2011.
+
+\bibitem[Nieh et~al.(2021)Nieh et~al.]{nieh2021}
+Edward~H Nieh et~al.
+\newblock Geometry of abstract learned knowledge in the hippocampus.
+\newblock \emph{Nature}, 595:80--84, 2021.
+
+\bibitem[O'Keefe and Dostrovsky(1971)]{okeefe1971}
+John O'Keefe and Jonathan Dostrovsky.
+\newblock The hippocampus as a spatial map.
+\newblock \emph{Brain Research}, 34:171--175, 1971.
+
+\bibitem[O'Keefe and Nadel(1978)]{okeefe1978}
+John O'Keefe and Lynn Nadel.
+\newblock \emph{The Hippocampus as a Cognitive Map}.
+\newblock Clarendon Press, 1978.
+
+\bibitem[Park et~al.(2020)Park, Miller, Nili, Ranganath, and Boorman]{park2020}
+Sang~Ah Park, David~S Miller, Hamed Nili, Charan Ranganath, and Erie~D Boorman.
+\newblock Map making: Constructing, combining, and inferring on abstract cognitive maps.
+\newblock \emph{Neuron}, 107:1226--1238.e8, 2020.
+
+\bibitem[Pnevmatikakis et~al.(2016)Pnevmatikakis et~al.]{pnevmatikakis2016}
+Eftychios~A Pnevmatikakis et~al.
+\newblock Simultaneous denoising, deconvolution, and demixing of calcium imaging data.
+\newblock \emph{Neuron}, 89:285--299, 2016.
+
+\bibitem[Pnevmatikakis and Giovannucci(2017)]{normcorre2017}
+Eftychios~A Pnevmatikakis and Andrea Giovannucci.
+\newblock NoRMCorre: An online algorithm for piecewise rigid motion correction of calcium imaging data.
+\newblock \emph{Journal of Neuroscience Methods}, 291:83--94, 2017.
+
+\bibitem[Recanatesi et~al.(2021)Recanatesi et~al.]{recanatesi2021}
+Stefano Recanatesi et~al.
+\newblock Predictive learning as a network mechanism for extracting low-dimensional latent space representations.
+\newblock \emph{Nature Communications}, 12:1417, 2021.
+
+\bibitem[Rubanova et~al.(2019)Rubanova, Chen, and Duvenaud]{rubanova2019}
+Yulia Rubanova, Ricky~TQ Chen, and David Duvenaud.
+\newblock Latent ordinary differential equations for irregularly-sampled time series.
+\newblock \emph{NeurIPS}, 2019.
+
+\bibitem[Russo et~al.(2018)Russo et~al.]{russo2018}
+Abigail~A Russo et~al.
+\newblock Motor cortex embeds muscle-like commands in an untangled population response.
+\newblock \emph{Neuron}, 97:953--966.e8, 2018.
+
+\bibitem[Schuck and Niv(2019)]{schuck2019}
+Nicolas~W Schuck and Yael Niv.
+\newblock Sequential replay of nonspatial task states in the human hippocampus.
+\newblock \emph{Science}, 364:eaaw5181, 2019.
+
+\bibitem[Stachenfeld et~al.(2017)Stachenfeld, Botvinick, and Gershman]{stachenfeld2017}
+Kimberly~L Stachenfeld, Matthew~M Botvinick, and Samuel~J Gershman.
+\newblock The hippocampus as a predictive map.
+\newblock \emph{Nature Neuroscience}, 20:1643--1653, 2017.
+
+\bibitem[Tenenbaum et~al.(2000)Tenenbaum, de Silva, and Langford]{tenenbaum2000}
+Joshua~B Tenenbaum, Vin de Silva, and John~C Langford.
+\newblock A global geometric framework for nonlinear dimensionality reduction.
+\newblock \emph{Science}, 290:2319--2323, 2000.
+
+\bibitem[Tolman(1948)]{tolman1948}
+Edward~C Tolman.
+\newblock Cognitive maps in rats and men.
+\newblock \emph{Psychological Review}, 55:189--208, 1948.
+
+\bibitem[Yu et~al.(2009)Yu et~al.]{yu2009}
+Byron~M Yu et~al.
+\newblock Gaussian-process factor analysis for low-dimensional single-trial analysis of neural population activity.
+\newblock \emph{Journal of Neurophysiology}, 102:614--635, 2009.
+
+\end{thebibliography}
 
 \end{document}
