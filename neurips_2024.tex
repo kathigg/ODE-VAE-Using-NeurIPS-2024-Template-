@@ -30,37 +30,42 @@
 \maketitle
 
 \begin{abstract}
-Neural activity can be represented as a trajectory in a high-dimensional space where each axis corresponds to one neuron. A central question in systems neuroscience is whether these trajectories are constrained to low-dimensional manifolds that jointly encode external variables and trial-to-trial internal variability. Building on this question, we develop and analyze a latent Neural ODE variational autoencoder (ODE-VAE) for calcium population recordings. The model encodes trial onset activity into a stochastic latent initial condition, evolves it through a continuous-time mixture-of-experts neural ODE, and decodes latent trajectories back to neural activity. Relative to earlier ODE-VAE versions, \texttt{v5} adds transition-aware reconstruction regularization and a soft locally linear embedding (LLE) latent constraint. Using repository-grounded experiments, we report strong reconstruction on synthetic random-foraging data (best seed \(R^2=0.9789\)) and mixed outcomes on the E65 hippocampal dataset, including an archived ODE-VAE run at \(R^2=0.4368\), strict raw-space \texttt{v5} sweeps with best-epoch \(R^2\le 0.0569\), and a no-PCA \texttt{v6} variant at \(R^2=0.0956\). These results show that continuous-time latent manifold models can capture structured dynamics, but evaluation protocol, preprocessing, and regularization balance strongly affect performance on real neural data.
+Neural population activity traces trajectories in a high-dimensional state space, yet accumulating evidence suggests these trajectories are confined to low-dimensional manifolds that encode both task variables and internal state. Existing manifold inference pipelines can recover geometry and explain variability, but often rely on multi-stage local models and do not impose globally smooth continuous-time dynamics. We develop a latent Neural ODE variational autoencoder (ODE-VAE) that jointly learns (i) a low-dimensional stochastic initial condition, (ii) continuous-time latent dynamics parameterized by a mixture-of-experts ODE, and (iii) a decoder back to neural activity. To better align reconstruction with temporally structured variability, our \texttt{v5} implementation adds transition-consistency regularization in observation space and a soft locally linear embedding (LLE) constraint in latent space. On synthetic random-foraging sequences, the model achieves high reconstruction accuracy (\(R^2=0.9789\)) while exhibiting seed sensitivity. On the E65 hippocampal calcium dataset, we observe moderate reconstruction in archived runs (\(R^2=0.4368\)) and substantial dependence on preprocessing, split strategy, and evaluation space. Together, these results highlight both the promise and current fragility of end-to-end continuous-time manifold models for noisy biological recordings.
 \end{abstract}
 
 \section{Introduction}
-Neural activity can be described as a point in a high-dimensional coordinate system, where each coordinate axis represents a single neuron's activity. Prior work shows that population trajectories often occupy low-dimensional manifolds, in motor cortex, hippocampus, and entorhinal circuits \citep{gallego2017,russo2018,okeefe1971,aronov2017,nieh2021}. This geometric view supports the broader ``cognitive map'' hypothesis: neural circuits organize both physical and abstract knowledge into structured latent spaces \citep{tolman1948,okeefe1978,stachenfeld2017,bellmund2018}.
+Neural activity can be described as a point in a high-dimensional space, where each coordinate axis corresponds to a neuron's activity. Despite this ambient dimensionality, population trajectories frequently occupy structured, low-dimensional manifolds. Such manifolds have been implicated in motor control \citep{gallego2017,russo2018}, spatial coding in hippocampus \citep{okeefe1971,okeefe1978}, and the representation of non-spatial variables \citep{aronov2017,nieh2021}. These findings motivate a geometric view of hippocampal computation: learned knowledge may be organized as trajectories on manifolds that encode both physical and abstract structure \citep{tolman1948,stachenfeld2017,bellmund2018}.
 
-Recent manifold analyses of hippocampal recordings report intrinsic dimensionalities around 4--6 and show that manifold geometry can explain both task variables and trial-level variability \citep{low2018,chaudhuri2019,nieh2021}. However, many pipelines are multi-stage: fit local transition models, build pairwise distances, embed points, and separately map back to activity \citep{low2018,tenenbaum2000,yu2009}. This decomposition gives useful geometry but does not explicitly enforce globally smooth continuous-time dynamics in a single end-to-end objective.
+Recent hippocampal manifold analyses estimate intrinsic dimensionalities on the order of 4--6 and show that manifold geometry can capture both task variables and structured trial-to-trial variability \citep{low2018,chaudhuri2019,nieh2021}. However, many approaches are multi-stage: they model transitions locally, define a data-dependent distance, embed points into a low-dimensional coordinate system, and then learn a separate reconstruction mapping \citep{low2018,tenenbaum2000,yu2009}. While effective for geometry, these pipelines do not directly couple representation learning, temporal evolution, and reconstruction in a single continuous-time generative model.
 
-This paper develops a continuous-time generative alternative tailored to the repository's ODE-VAE codebase. Starting from an initial latent ODE-VAE, we focus on \texttt{v5}, which adds (i) a mixture-of-experts (MoE) latent vector field, (ii) transition-aware reconstruction regularization, and (iii) soft LLE regularization in latent space. We evaluate this family on synthetic and real hippocampal calcium data and document where the method works and where it fails.
+We propose a latent Neural ODE variational autoencoder (ODE-VAE) for trialized population recordings. The model encodes trial onset activity into a stochastic latent initial condition, evolves it via a continuous-time latent ODE, and decodes latent trajectories back to neural activity. Our \texttt{v5} implementation introduces mixture-of-experts latent dynamics and adds two regularizers inspired by manifold inference: (i) transition consistency in observation space to encourage accurate step-to-step changes, and (ii) a soft LLE constraint to encourage locally linear latent structure without forcing a globally linear embedding. We evaluate this family on synthetic and hippocampal calcium datasets and analyze the sensitivity of performance to preprocessing and evaluation choices.
 
 \paragraph{Contributions.}
 \begin{itemize}
-\item We present a mathematically explicit latent Neural ODE-VAE formulation for trial-based neural population sequences, including MoE latent dynamics and local-geometric regularizers.
-\item We instantiate this formulation using the repository's \texttt{v1--v6} implementations, with \texttt{v5} as the main model and \texttt{v6} as a no-PCA extension.
-\item We provide artifact-grounded empirical analysis on synthetic and E65 datasets, including seed sensitivity and configuration-dependent instability.
-\item We identify concrete protocol factors (split strategy, landmark subsampling, and metric space) that materially influence reported \(R^2\).
+\item We formalize an ODE-VAE for trialized population sequences with mixture-of-experts latent dynamics and explicit geometric regularizers.
+\item We instantiate this formulation in a versioned codebase (\texttt{v1--v6}) and present \texttt{v5} as the primary model with transition and soft-LLE regularization.
+\item We provide a reproducible evaluation on synthetic and hippocampal calcium datasets and identify protocol factors that strongly affect reconstruction metrics.
 \end{itemize}
 
 \section{Related Work}
-Our approach sits at the intersection of hippocampal manifold neuroscience and deep latent dynamical systems. In neuroscience, place cells and cognitive map theories motivate low-dimensional geometric structure in population activity \citep{okeefe1971,okeefe1978,eichenbaum2014}. More recent work extends these ideas to abstract and non-spatial variables \citep{constantinescu2016,schuck2019,park2020,aronov2017,nieh2021}. Population-level manifold analyses in hippocampus and other circuits show that latent geometry can explain behavior and internal state variability \citep{low2018,chaudhuri2019,gallego2017}.
+Our approach lies at the intersection of manifold-based neuroscience and latent dynamical systems. In hippocampus, the cognitive map framework and subsequent experimental work motivate geometric organization of population codes \citep{okeefe1971,okeefe1978,eichenbaum2014}, including abstract and non-spatial representations \citep{constantinescu2016,schuck2019,park2020,aronov2017,nieh2021}. Manifold inference from neural dynamics can recover low-dimensional structure and explain structured variability beyond measured task variables \citep{low2018,chaudhuri2019}.
 
-In machine learning, variational autoencoders \citep{kingma2014} and neural ODEs \citep{chen2018} enable continuous-time latent-variable models, including latent ODEs for irregular trajectories \citep{rubanova2019}. Our model adopts this framework but targets neuroscientific interpretability: trialized sequences, manifold visualizations, and explicit regularizers for smoothness, transition consistency, and local linearity.
+In machine learning, variational autoencoders \citep{kingma2014} and neural ODEs \citep{chen2018} provide a principled framework for continuous-time latent-variable modeling. Latent ODEs extend this idea to irregularly sampled sequences \citep{rubanova2019}. We adopt this framework but tailor the encoder, evaluation protocol, and regularization to the neuroscience setting, emphasizing trialized sequences, explicit geometric constraints, and manifold visualizations that facilitate comparison to prior manifold studies.
 
 \section{Problem Setup and Data}
-Let \(x_b(t_\ell) \in \mathbb{R}^{N}\) denote population activity for trial \(b\in\{1,\dots,B\}\) at resampled time index \(\ell\in\{1,\dots,L\}\).
+We study trialized population activity sequences. Let \(y_b(t_\ell)\in\mathbb{R}^{N}\) denote the raw activity of \(N\) simultaneously recorded units/ROIs on trial \(b\in\{1,\dots,B\}\) at resampled time \(t_\ell\), where \(\ell\in\{1,\dots,L\}\) indexes a fixed-length grid. We write \(Y_b\in\mathbb{R}^{L\times N}\) for the stacked sequence.
+
+\paragraph{Observation space.}
+In \texttt{v5}, the model is trained on a PCA-projected representation of activity. Let \(x_b(t_\ell)\in\mathbb{R}^{K}\) be the \(K\)-dimensional PCA coordinate at time \(t_\ell\), and let \(X_b\in\mathbb{R}^{L\times K}\) be the corresponding trial sequence. Unless otherwise stated, all losses and reported \(R^2\) values for \texttt{v5} are computed in this PCA space. For some evaluations (e.g., the optional sweep path), reconstructions are mapped back to raw ROI space via inverse PCA and de-normalization.
+
+\paragraph{Time grid.}
+Trials are resampled to a common duration and the time vector is normalized to \([0,1]\); we denote the resulting grid by \(0=t_1<\cdots<t_L=1\). The latent dimension is denoted by \(D\).
 
 \paragraph{E65 dataset.}
-The repository's main real dataset is \texttt{E65\_data.npz}, containing calcium activity \((N=375,\ T=7434)\), trial IDs, timestamps, and aligned behavioral covariates. In the \texttt{v5} preprocessing path: (i) PCA retains 95\% variance, producing \(K=129\) components; (ii) trials are resampled to \(L=120\) bins using \texttt{trial\_len\_s=12} and \texttt{fps=10}; (iii) first 10 trials are dropped, yielding 180 usable trials; (iv) default validation holds out 3 trials (train 177 / val 3).
+We use the Schottdorf Lab E65 dataset (\texttt{E65\_data.npz}), containing calcium activity (\(\Delta F/F\)) from \(N=375\) ROIs over \(T=7434\) frames, along with trial IDs, timestamps, and aligned behavioral covariates. In the \texttt{v5} preprocessing path: (i) PCA is fit to the full recording and retains 95\% variance, producing \(K=129\) components; (ii) frames are grouped by trial, the first 10 trials are dropped, and each trial is linearly interpolated to a fixed length \(L=120\) (\texttt{trial\_len\_s=12}, \texttt{fps=10}); (iii) the time vector is normalized to \([0,1]\); (iv) each PCA component is standardized over time (session-level z-score) and an optional per-trial baseline is removed by subtracting the mean of the first 5 resampled bins. After filtering, 180 trials are available; default validation holds out the last 3 trials (train 177 / val 3). For efficiency, the default configuration further subsamples to 100 sequences via greedy landmark selection.
 
 \paragraph{Synthetic benchmark.}
-The repository also includes \texttt{synthetic\_rat\_data.npz} (4000 frames, 300 neurons, 20 trials), used to test recoverability of smooth low-dimensional dynamics under controlled conditions.
+We additionally evaluate on \texttt{synthetic\_rat\_data.npz} (4000 frames, 300 neurons, 20 trials), which provides a controlled benchmark for recoverability of smooth low-dimensional dynamics.
 
 \section{Model: Latent Neural ODE-VAE}
 \subsection{Stochastic encoder}
@@ -72,6 +77,7 @@ with reparameterization
 \begin{equation}
 z_{0,b} = \mu_b + \sigma_b \odot \epsilon, \qquad \epsilon \sim \mathcal{N}(0, I).
 \end{equation}
+Here \(z_{0,b}\in\mathbb{R}^D\), \(\mu_b\in\mathbb{R}^D\), \(\sigma_b\in\mathbb{R}^D_{>0}\), and \(\odot\) denotes elementwise multiplication.
 
 \subsection{Continuous-time latent dynamics}
 Latent trajectories are generated by a neural ODE:
@@ -84,6 +90,7 @@ f_\theta(z,t) = \sum_{e=1}^{E} \pi_e(z) f_e(z), \qquad
 \pi(z)=\operatorname{softmax}(g(z)),
 \end{equation}
 with \(E=4\) latent experts by default and Dormand--Prince integration (\texttt{dopri5}).
+Each expert \(f_e:\mathbb{R}^D\to\mathbb{R}^D\) is an MLP and \(\pi_e(z)\in[0,1]\) are gating weights satisfying \(\sum_e \pi_e(z)=1\).
 
 \subsection{Decoder family}
 A decoder maps latent states back to observations:
@@ -91,19 +98,29 @@ A decoder maps latent states back to observations:
 \hat{x}_b(t_\ell)=g_\psi(z_b(t_\ell)).
 \end{equation}
 The codebase supports MLP, neuron-aware, local-attention, and MoE decoders; \texttt{v5} default is MoE decoder with 8 decoder experts.
+In all cases, \(g_\psi:\mathbb{R}^D\to\mathbb{R}^K\) outputs the mean of a factorized Gaussian observation model in PCA space.
 
 \section{Training Objective and Regularization}
+We optimize a variational objective with auxiliary regularizers. Under a Gaussian observation model \(p_\psi(x_b(t_\ell)\mid z_b(t_\ell))=\mathcal{N}(g_\psi(z_b(t_\ell)),\sigma^2 I)\) with fixed \(\sigma^2\), maximizing the ELBO corresponds (up to constants and a scale factor) to minimizing mean-squared reconstruction error plus a KL penalty.
+
 The base objective combines reconstruction and KL terms:
 \begin{equation}
 \mathcal{L}_{\text{base}} = \mathcal{L}_{\text{rec}} + \beta\,\mathcal{L}_{\text{KL}},
 \end{equation}
 where
 \begin{equation}
-\mathcal{L}_{\text{rec}} = \frac{1}{BLK}\sum_{b,\ell}\|\hat{x}_b(t_\ell)-x_b(t_\ell)\|_2^2,
+\mathcal{L}_{\text{rec}} = \frac{1}{B\,L\,K}\sum_{b=1}^{B}\sum_{\ell=1}^{L}\|\hat{x}_b(t_\ell)-x_b(t_\ell)\|_2^2,
 \end{equation}
 \begin{equation}
 \mathcal{L}_{\text{KL}} = \frac{1}{B}\sum_b D_{\text{KL}}\big(q_\phi(z_{0,b}\mid x_b(t_1))\,\|\,\mathcal{N}(0,I)\big).
 \end{equation}
+Equivalently, the (negative) ELBO per trial is
+\begin{equation}
+\mathcal{L}_{\text{ELBO}} =
+-\mathbb{E}_{q_\phi(z_{0,b}\mid x_b(t_1))}\Big[\sum_{\ell=1}^{L}\log p_\psi(x_b(t_\ell)\mid z_b(t_\ell))\Big]
++\beta\,D_{\mathrm{KL}}\big(q_\phi(z_{0,b}\mid x_b(t_1))\,\|\,p(z_{0,b})\big),
+\end{equation}
+with prior \(p(z_{0,b})=\mathcal{N}(0,I)\). In practice, the code uses a single Monte Carlo sample of \(z_{0,b}\) per trial and minibatch.
 
 \paragraph{Smoothness regularization.}
 \begin{equation}
@@ -119,7 +136,7 @@ where
 This term is linearly warmed up for the first 30 epochs.
 
 \paragraph{Soft LLE latent regularization (\texttt{v5}).}
-For flattened latent points \(\{z_i\}_{i=1}^M\), with \(k\)-NN set \(\mathcal{N}_k(i)\):
+For flattened latent points \(\{z_i\}_{i=1}^M\subset\mathbb{R}^D\), with \(k\)-NN set \(\mathcal{N}_k(i)\), we add a soft locally linear embedding penalty \citep{saul2003}:
 \begin{equation}
 \mathcal{L}_{\text{LLE}} = \frac{1}{M}\sum_{i=1}^{M}
 \left\|z_i-\sum_{j\in\mathcal{N}_k(i)}w_{ij}z_j\right\|_2^2,
@@ -139,18 +156,22 @@ The KL coefficient \(\beta_t\) is warmed up over 30 epochs to a final value \(\b
 
 \section{Experimental Protocol}
 \subsection{Configurations}
-Main \texttt{v5} settings from \texttt{config.txt}: latent dimension 5 (with sweep to 8), batch size 8, 150 epochs, Adam optimizer (learning rate 0.002, weight decay \(10^{-5}\)), \(\lambda_{\text{smooth}}\in\{5\times10^{-4},2\times10^{-4}\}\), \(\lambda_{\text{trans}}=0.01\), \(\lambda_{\text{LLE}}=0.01\), landmark count 100, and baseline correction enabled.
+Main \texttt{v5} settings from \texttt{config.txt}: latent dimension \(D=5\) (with a sweep to \(D=8\)), batch size 8, 150 epochs, Adam optimizer (learning rate 0.002, weight decay \(10^{-5}\)), \(\lambda_{\text{smooth}}\in\{5\times10^{-4},2\times10^{-4}\}\), \(\lambda_{\text{trans}}=0.01\) with a 30-epoch warmup, \(\lambda_{\text{LLE}}=0.01\), landmark count 100, and baseline correction enabled.
+
+\paragraph{Implementation details.}
+The encoder is an MLP with hidden widths 512--256--128. The latent vector field uses \(E=4\) experts with hidden width 128 and a learned gating network; derivatives are layer-normalized for stability. For reconstruction, the default \texttt{v5} decoder is a mixture-of-experts network with 8 decoder experts and hidden width 256. Latent dynamics are integrated with Dormand--Prince (\texttt{dopri5}) using tolerances \texttt{rtol=1e-3} and \texttt{atol=1e-4}. Gradients are clipped to max norm 1.0.
 
 \subsection{Metrics}
 The primary training metric is coefficient of determination,
 \begin{equation}
-R^2 = 1-\frac{\sum (X-\hat{X})^2}{\sum (X-\bar{X})^2}.
+R^2 = 1-\frac{\sum_{b,\ell}\|x_b(t_\ell)-\hat{x}_b(t_\ell)\|_2^2}{\sum_{b,\ell}\|x_b(t_\ell)-\bar{x}\|_2^2},
 \end{equation}
-The repository contains two evaluation styles: (i) PCA-space \(R^2\) and (ii) strict raw-neuron-space \(R^2\) via inverse PCA and de-normalization. We report artifact values as stored in each run metadata file.
+where \(\bar{x}=\frac{1}{B\,L}\sum_{b,\ell} x_b(t_\ell)\) denotes the mean activity vector across all validation entries in the evaluation space.
+Our implementation supports two evaluation styles: (i) PCA-space \(R^2\) and (ii) strict raw-neuron-space \(R^2\) via inverse PCA and de-normalization. We report values as saved in the run metadata for each experiment.
 
 \section{Results}
 \subsection{Synthetic benchmark: high ceiling with seed sensitivity}
-Table~\ref{tab:synthetic} summarizes the repository seed sweep on synthetic data. Best seed reaches \(R^2=0.9789\), but one seed collapses to NaN/0.0, indicating optimizer sensitivity.
+Table~\ref{tab:synthetic} summarizes a five-seed sweep on synthetic data. The best seed reaches \(R^2=0.9789\). Excluding the divergent run, the mean performance is \(R^2=0.828\pm 0.141\) (std. dev.), indicating sensitivity to initialization even in a controlled setting.
 
 \begin{table}[t]
 \centering
@@ -173,21 +194,21 @@ Mean (non-collapsed seeds) & 0.8282 & -- \\
 \end{table}
 
 \subsection{E65 hippocampal data: mixed performance across variants}
-Table~\ref{tab:e65} reports all E65 artifact metrics found in the repository for the ODE-VAE family. An archived ODE-VAE run reports \(R^2=0.4368\). Strict raw-space \texttt{v5} sweep artifacts are substantially lower (best-epoch \(R^2\le 0.0569\), negative final \(R^2\) in three runs), while \texttt{v6} (no PCA) records \(R^2=0.0956\).
+Table~\ref{tab:e65} reports available E65 run metrics for the ODE-VAE family. An archived ODE-VAE run reports \(R^2=0.4368\). In contrast, \texttt{v5} sweep artifacts are substantially lower (best-epoch \(R^2\le 0.0569\), negative final \(R^2\) in three runs), while a no-PCA \texttt{v6} run records \(R^2=0.0956\). These discrepancies are consistent with the codebase supporting multiple evaluation spaces and split protocols; therefore, comparisons across runs should be interpreted cautiously unless the evaluation definition is matched.
 
 \begin{table}[t]
 \centering
-\caption{E65 run artifacts from saved metadata/checkpoints.}
+\caption{E65 reconstruction metrics extracted from saved run artifacts. Sweep runs report both best-epoch and final \(R^2\) as logged during training.}
 \label{tab:e65}
-\begin{tabular}{lccc}
+\begin{tabular}{lccccc}
 \toprule
-Artifact (path) & Variant summary & Best reported \(R^2\) & Final reported \(R^2\) \\
+Variant & Space & \(D\) & \(\lambda_{\text{smooth}}\) & Best \(R^2\) & Final \(R^2\) \\
 \midrule
-\texttt{runs/ode\_vae\_E65/run\_metadata.json} & archived ODE-VAE & -- & 0.4368 \\
-\texttt{runs/ode\_vae\_E65/ld5\_b0.02\_ls0.0005/run\_metadata.json} & \texttt{v5}, \(d=5\) & 0.0354 & -0.2391 \\
-\texttt{runs/ode\_vae\_E65/ld5\_b0.02\_ls0.0002/run\_metadata.json} & \texttt{v5}, \(d=5\) & 0.0353 & -0.1382 \\
-\texttt{runs/ode\_vae\_E65/ld8\_b0.02\_ls0.0005/run\_metadata.json} & \texttt{v5}, \(d=8\) & 0.0569 & -0.2022 \\
-\texttt{src/pt\_files/final\_metrics.pt} & \texttt{v6}, no PCA & -- & 0.0956 \\
+archived ODE-VAE & PCA & -- & -- & -- & 0.4368 \\
+\texttt{v5} sweep & PCA & 5 & \(5\times 10^{-4}\) & 0.0354 & -0.2391 \\
+\texttt{v5} sweep & PCA & 5 & \(2\times 10^{-4}\) & 0.0353 & -0.1382 \\
+\texttt{v5} sweep & PCA & 8 & \(5\times 10^{-4}\) & 0.0569 & -0.2022 \\
+\texttt{v6} (no PCA) & raw & -- & -- & -- & 0.0956 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -205,7 +226,7 @@ The codebase saves latent manifold projections (MDS) and reconstruction diagnost
 \section{Discussion}
 The model captures the intended inductive bias: low-dimensional continuous latent trajectories with explicit geometric regularization. On synthetic data, this bias is highly effective. On real E65 recordings, however, results are sensitive to implementation and evaluation choices.
 
-Three factors emerge from the repository artifacts:
+Three factors emerge from the saved run artifacts:
 \begin{enumerate}
 \item \textbf{Metric-space mismatch.} PCA-space training can look favorable while strict raw-space \(R^2\) may degrade.
 \item \textbf{Data-efficiency tradeoff.} Landmark subsampling (100 selected sequences from 180 usable trials) accelerates training but may reduce generalization.
@@ -215,137 +236,15 @@ Three factors emerge from the repository artifacts:
 These observations suggest that future gains likely require protocol-level changes in addition to architectural changes: larger and randomized holdout splits, early stopping on a stable cross-validated objective, trial-level (not frame-level) landmark selection, and direct raw-space reconstruction losses.
 
 \section{Limitations and Reproducibility}
-This study is bounded by available run artifacts in the repository and inherits version-specific logging differences. In particular, some run files report ``best'' and ``final'' \(R^2\) under different conditions, and not all checkpoints include identical metadata fields. We therefore report values exactly as saved in each artifact path. The codebase also indicates unresolved training fragility (including occasional NaN collapse), which should be addressed before definitive biological claims.
+This study is bounded by the available run artifacts and inherits version-specific logging differences. In particular, some run files report ``best'' and ``final'' \(R^2\) under different conditions, and not all checkpoints include identical metadata fields. We therefore report values exactly as saved in each artifact path. The implementation also exhibits training fragility (including occasional NaN divergence), which should be addressed before drawing definitive biological conclusions.
 
 \section{Conclusion}
-We presented a mathematically grounded latent Neural ODE-VAE framework for neural manifold modeling and analyzed the repository's \texttt{v1--v6} trajectory with \texttt{v5} as the primary model. The method can recover smooth low-dimensional dynamics and high synthetic reconstruction quality, but real-data performance remains sensitive to preprocessing and evaluation protocol. This work provides a formalized foundation and a clear set of engineering directions for turning ODE-VAE manifold modeling into a robust neuroscience analysis tool.
+We presented a mathematically grounded latent Neural ODE-VAE framework for neural manifold modeling and analyzed a sequence of model variants (\texttt{v1--v6}), with \texttt{v5} as the primary model. The method can recover smooth low-dimensional dynamics and high synthetic reconstruction quality, but real-data performance remains sensitive to preprocessing and evaluation protocol. This work provides a formal foundation and concrete directions for improving robustness of ODE-VAE manifold modeling for neuroscience.
 
 \paragraph{Societal impact.}
 This work is basic research on neural representation learning from animal neuroscience data and has no immediate direct societal deployment. Potential long-term impact is improved scientific understanding of memory and cognition.
 
 \bibliographystyle{plainnat}
-\begin{thebibliography}{99}
-
-\bibitem[Aronov et~al.(2017)Aronov, Nevers, and Tank]{aronov2017}
-Dmitriy Aronov, Rachel Nevers, and David W Tank.
-\newblock Mapping of a non-spatial dimension by the hippocampal-entorhinal circuit.
-\newblock \emph{Nature}, 543:719--722, 2017.
-
-\bibitem[Bellmund et~al.(2018)Bellmund, Gardenfors, Moser, and Doeller]{bellmund2018}
-Jacob L~S Bellmund, Peter Gardenfors, Edvard~I Moser, and Christian~F Doeller.
-\newblock Navigating cognition: Spatial codes for human thinking.
-\newblock \emph{Science}, 362:eaat6766, 2018.
-
-\bibitem[Chaudhuri et~al.(2019)Chaudhuri, Gercek, Pandey, Peyrache, and Fiete]{chaudhuri2019}
-Rishidev Chaudhuri, Burak Gercek, Bikash Pandey, Adrien Peyrache, and Ila Fiete.
-\newblock The intrinsic attractor manifold and population dynamics of a canonical cognitive circuit across waking and sleep.
-\newblock \emph{Nature Neuroscience}, 22:1512--1520, 2019.
-
-\bibitem[Chen et~al.(2018)Chen, Rubanova, Bettencourt, and Duvenaud]{chen2018}
-Ricky~TQ Chen, Yulia Rubanova, Jesse Bettencourt, and David Duvenaud.
-\newblock Neural ordinary differential equations.
-\newblock \emph{NeurIPS}, 2018.
-
-\bibitem[Constantinescu et~al.(2016)Constantinescu, O'Reilly, and Behrens]{constantinescu2016}
-Alexandra~O Constantinescu, Jill~X O'Reilly, and Timothy~EJ Behrens.
-\newblock Organizing conceptual knowledge in humans with a grid-like code.
-\newblock \emph{Science}, 352:1464--1468, 2016.
-
-\bibitem[Eichenbaum and Cohen(2014)]{eichenbaum2014}
-Howard Eichenbaum and Neal~J Cohen.
-\newblock Can we reconcile the declarative memory and spatial navigation views on hippocampal function?
-\newblock \emph{Neuron}, 83:764--770, 2014.
-
-\bibitem[Gallego et~al.(2017)Gallego, Perich, Miller, and Solla]{gallego2017}
-Juan~A Gallego, Matthew~G Perich, Lee~E Miller, and Sara~A Solla.
-\newblock Neural manifolds for the control of movement.
-\newblock \emph{Neuron}, 94:978--984, 2017.
-
-\bibitem[Kingma and Welling(2014)]{kingma2014}
-Diederik~P Kingma and Max Welling.
-\newblock Auto-encoding variational bayes.
-\newblock \emph{ICLR}, 2014.
-
-\bibitem[Low et~al.(2018)Low, Lewallen, Aronov, Nevers, and Tank]{low2018}
-Ryan~J Low, Sean Lewallen, Dmitriy Aronov, Rachel Nevers, and David~W Tank.
-\newblock Probing variability in a cognitive map using manifold inference from neural dynamics.
-\newblock \emph{bioRxiv}, 2018.
-
-\bibitem[MacDonald et~al.(2011)MacDonald, Lepage, Eden, and Eichenbaum]{macdonald2011}
-Christopher~J MacDonald, Kyle~Q Lepage, Uri~T Eden, and Howard Eichenbaum.
-\newblock Hippocampal time cells bridge the gap in memory for discontiguous events.
-\newblock \emph{Neuron}, 71:737--749, 2011.
-
-\bibitem[Nieh et~al.(2021)Nieh et~al.]{nieh2021}
-Edward~H Nieh et~al.
-\newblock Geometry of abstract learned knowledge in the hippocampus.
-\newblock \emph{Nature}, 595:80--84, 2021.
-
-\bibitem[O'Keefe and Dostrovsky(1971)]{okeefe1971}
-John O'Keefe and Jonathan Dostrovsky.
-\newblock The hippocampus as a spatial map.
-\newblock \emph{Brain Research}, 34:171--175, 1971.
-
-\bibitem[O'Keefe and Nadel(1978)]{okeefe1978}
-John O'Keefe and Lynn Nadel.
-\newblock \emph{The Hippocampus as a Cognitive Map}.
-\newblock Clarendon Press, 1978.
-
-\bibitem[Park et~al.(2020)Park, Miller, Nili, Ranganath, and Boorman]{park2020}
-Sang~Ah Park, David~S Miller, Hamed Nili, Charan Ranganath, and Erie~D Boorman.
-\newblock Map making: Constructing, combining, and inferring on abstract cognitive maps.
-\newblock \emph{Neuron}, 107:1226--1238.e8, 2020.
-
-\bibitem[Pnevmatikakis et~al.(2016)Pnevmatikakis et~al.]{pnevmatikakis2016}
-Eftychios~A Pnevmatikakis et~al.
-\newblock Simultaneous denoising, deconvolution, and demixing of calcium imaging data.
-\newblock \emph{Neuron}, 89:285--299, 2016.
-
-\bibitem[Pnevmatikakis and Giovannucci(2017)]{normcorre2017}
-Eftychios~A Pnevmatikakis and Andrea Giovannucci.
-\newblock NoRMCorre: An online algorithm for piecewise rigid motion correction of calcium imaging data.
-\newblock \emph{Journal of Neuroscience Methods}, 291:83--94, 2017.
-
-\bibitem[Recanatesi et~al.(2021)Recanatesi et~al.]{recanatesi2021}
-Stefano Recanatesi et~al.
-\newblock Predictive learning as a network mechanism for extracting low-dimensional latent space representations.
-\newblock \emph{Nature Communications}, 12:1417, 2021.
-
-\bibitem[Rubanova et~al.(2019)Rubanova, Chen, and Duvenaud]{rubanova2019}
-Yulia Rubanova, Ricky~TQ Chen, and David Duvenaud.
-\newblock Latent ordinary differential equations for irregularly-sampled time series.
-\newblock \emph{NeurIPS}, 2019.
-
-\bibitem[Russo et~al.(2018)Russo et~al.]{russo2018}
-Abigail~A Russo et~al.
-\newblock Motor cortex embeds muscle-like commands in an untangled population response.
-\newblock \emph{Neuron}, 97:953--966.e8, 2018.
-
-\bibitem[Schuck and Niv(2019)]{schuck2019}
-Nicolas~W Schuck and Yael Niv.
-\newblock Sequential replay of nonspatial task states in the human hippocampus.
-\newblock \emph{Science}, 364:eaaw5181, 2019.
-
-\bibitem[Stachenfeld et~al.(2017)Stachenfeld, Botvinick, and Gershman]{stachenfeld2017}
-Kimberly~L Stachenfeld, Matthew~M Botvinick, and Samuel~J Gershman.
-\newblock The hippocampus as a predictive map.
-\newblock \emph{Nature Neuroscience}, 20:1643--1653, 2017.
-
-\bibitem[Tenenbaum et~al.(2000)Tenenbaum, de Silva, and Langford]{tenenbaum2000}
-Joshua~B Tenenbaum, Vin de Silva, and John~C Langford.
-\newblock A global geometric framework for nonlinear dimensionality reduction.
-\newblock \emph{Science}, 290:2319--2323, 2000.
-
-\bibitem[Tolman(1948)]{tolman1948}
-Edward~C Tolman.
-\newblock Cognitive maps in rats and men.
-\newblock \emph{Psychological Review}, 55:189--208, 1948.
-
-\bibitem[Yu et~al.(2009)Yu et~al.]{yu2009}
-Byron~M Yu et~al.
-\newblock Gaussian-process factor analysis for low-dimensional single-trial analysis of neural population activity.
-\newblock \emph{Journal of Neurophysiology}, 102:614--635, 2009.
-
-\end{thebibliography}
+\bibliography{references}
 
 \end{document}

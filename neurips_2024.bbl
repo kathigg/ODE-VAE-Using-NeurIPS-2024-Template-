@@ -1,0 +1,141 @@
+\begin{thebibliography}{21}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Aronov et~al.(2017)Aronov, Nevers, and Tank]{aronov2017}
+Dmitriy Aronov, Rachel Nevers, and David~W. Tank.
+\newblock Mapping of a non-spatial dimension by the hippocampal--entorhinal
+  circuit.
+\newblock \emph{Nature}, 543\penalty0 (7647):\penalty0 719--722, 2017.
+
+\bibitem[Bellmund et~al.(2018)Bellmund, G{\"a}rdenfors, Moser, and
+  Doeller]{bellmund2018}
+Jacob L.~S. Bellmund, Peter G{\"a}rdenfors, Edvard~I. Moser, and Christian~F.
+  Doeller.
+\newblock Navigating cognition: Spatial codes for human thinking.
+\newblock \emph{Science}, 362\penalty0 (6415):\penalty0 eaat6766, 2018.
+
+\bibitem[Chaudhuri et~al.(2019)Chaudhuri, Ger{\c{c}}ek, Pandey, Peyrache, and
+  Fiete]{chaudhuri2019}
+Rishidev Chaudhuri, Burak Ger{\c{c}}ek, Bikash Pandey, Adrien Peyrache, and Ila
+  Fiete.
+\newblock The intrinsic attractor manifold and population dynamics of a
+  canonical cognitive circuit across waking and sleep.
+\newblock \emph{Nature Neuroscience}, 22:\penalty0 1512--1520, 2019.
+
+\bibitem[Chen et~al.(2018)Chen, Rubanova, Bettencourt, and Duvenaud]{chen2018}
+Ricky T.~Q. Chen, Yulia Rubanova, Jesse Bettencourt, and David Duvenaud.
+\newblock Neural ordinary differential equations.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2018.
+
+\bibitem[Constantinescu et~al.(2016)Constantinescu, O'Reilly, and
+  Behrens]{constantinescu2016}
+Alexandra~O. Constantinescu, Jill~X. O'Reilly, and Timothy E.~J. Behrens.
+\newblock Organizing conceptual knowledge in humans with a grid-like code.
+\newblock \emph{Science}, 352\penalty0 (6292):\penalty0 1464--1468, 2016.
+
+\bibitem[Eichenbaum and Cohen(2014)]{eichenbaum2014}
+Howard Eichenbaum and Neal~J. Cohen.
+\newblock Can we reconcile the declarative memory and spatial navigation views
+  on hippocampal function?
+\newblock \emph{Neuron}, 83\penalty0 (4):\penalty0 764--770, 2014.
+
+\bibitem[Gallego et~al.(2017)Gallego, Perich, Miller, and Solla]{gallego2017}
+Juan~A. Gallego, Matthew~G. Perich, Lee~E. Miller, and Sara~A. Solla.
+\newblock Neural manifolds for the control of movement.
+\newblock \emph{Neuron}, 94\penalty0 (5):\penalty0 978--984, 2017.
+
+\bibitem[Kingma and Welling(2014)]{kingma2014}
+Diederik~P. Kingma and Max Welling.
+\newblock Auto-encoding variational bayes.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2014.
+
+\bibitem[Low et~al.(2018)Low, Lewallen, Aronov, Nevers, and Tank]{low2018}
+Ryan~J. Low, Sean Lewallen, Dmitriy Aronov, Rachel Nevers, and David~W. Tank.
+\newblock Probing variability in a cognitive map using manifold inference from
+  neural dynamics.
+\newblock \emph{bioRxiv}, 2018.
+\newblock \doi{10.1101/418939}.
+
+\bibitem[Nieh et~al.(2021)]{nieh2021}
+Edward~H. Nieh et~al.
+\newblock Geometry of abstract learned knowledge in the hippocampus.
+\newblock \emph{Nature}, 595\penalty0 (7865):\penalty0 80--84, 2021.
+
+\bibitem[O'Keefe and Dostrovsky(1971)]{okeefe1971}
+John O'Keefe and Jonathan Dostrovsky.
+\newblock The hippocampus as a spatial map. preliminary evidence from unit
+  activity in the freely-moving rat.
+\newblock \emph{Brain Research}, 34\penalty0 (1):\penalty0 171--175, 1971.
+
+\bibitem[O'Keefe and Nadel(1978)]{okeefe1978}
+John O'Keefe and Lynn Nadel.
+\newblock \emph{The Hippocampus as a Cognitive Map}.
+\newblock Clarendon Press, 1978.
+
+\bibitem[Park et~al.(2020)Park, Miller, Nili, Ranganath, and Boorman]{park2020}
+Sang~Ah Park, David~S. Miller, Hamed Nili, Charan Ranganath, and Erie~D.
+  Boorman.
+\newblock Map making: Constructing, combining, and inferring on abstract
+  cognitive maps.
+\newblock \emph{Neuron}, 107\penalty0 (6):\penalty0 1226--1238.e8, 2020.
+
+\bibitem[Rubanova et~al.(2019)Rubanova, Chen, and Duvenaud]{rubanova2019}
+Yulia Rubanova, Ricky T.~Q. Chen, and David Duvenaud.
+\newblock Latent ordinary differential equations for irregularly-sampled time
+  series.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2019.
+
+\bibitem[Russo et~al.(2018)]{russo2018}
+Abigail~A. Russo et~al.
+\newblock Motor cortex embeds muscle-like commands in an untangled population
+  response.
+\newblock \emph{Neuron}, 97\penalty0 (4):\penalty0 953--966.e8, 2018.
+
+\bibitem[Saul and Roweis(2003)]{saul2003}
+Lawrence~K. Saul and Sam~T. Roweis.
+\newblock Think globally, fit locally: Unsupervised learning of low dimensional
+  manifolds.
+\newblock \emph{Journal of Machine Learning Research}, 4:\penalty0 119--155,
+  2003.
+
+\bibitem[Schuck and Niv(2019)]{schuck2019}
+Nicolas~W. Schuck and Yael Niv.
+\newblock Sequential replay of nonspatial task states in the human hippocampus.
+\newblock \emph{Science}, 364\penalty0 (6447):\penalty0 eaaw5181, 2019.
+
+\bibitem[Stachenfeld et~al.(2017)Stachenfeld, Botvinick, and
+  Gershman]{stachenfeld2017}
+Kimberly~L. Stachenfeld, Matthew~M. Botvinick, and Samuel~J. Gershman.
+\newblock The hippocampus as a predictive map.
+\newblock \emph{Nature Neuroscience}, 20\penalty0 (11):\penalty0 1643--1653,
+  2017.
+
+\bibitem[Tenenbaum et~al.(2000)Tenenbaum, de~Silva, and
+  Langford]{tenenbaum2000}
+Joshua~B. Tenenbaum, Vin de~Silva, and John~C. Langford.
+\newblock A global geometric framework for nonlinear dimensionality reduction.
+\newblock \emph{Science}, 290\penalty0 (5500):\penalty0 2319--2323, 2000.
+
+\bibitem[Tolman(1948)]{tolman1948}
+Edward~C. Tolman.
+\newblock Cognitive maps in rats and men.
+\newblock \emph{Psychological Review}, 55\penalty0 (4):\penalty0 189--208,
+  1948.
+
+\bibitem[Yu et~al.(2009)Yu, Cunningham, Santhanam, Ryu, Shenoy, and
+  Sahani]{yu2009}
+Byron~M. Yu, John~P. Cunningham, Gopal Santhanam, Stephen~I. Ryu, Krishna~V.
+  Shenoy, and Maneesh Sahani.
+\newblock Gaussian-process factor analysis for low-dimensional single-trial
+  analysis of neural population activity.
+\newblock \emph{Journal of Neurophysiology}, 102\penalty0 (1):\penalty0
+  614--635, 2009.
+
+\end{thebibliography}
