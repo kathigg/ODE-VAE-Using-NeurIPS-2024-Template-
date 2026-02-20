@@ -1,0 +1,31 @@
+name: Update Neuroscience Submodule
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'  # every hour (adjust if you want)
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout paper repo
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update submodule
+        run: |
+          git submodule update --remote neuroscience-code
+          
+      - name: Commit and push if changed
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add neuroscience-code
+            git commit -m "Auto-update neuroscience submodule"
+            git push
+          fi
