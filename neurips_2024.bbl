@@ -1,4 +1,4 @@
-\begin{thebibliography}{21}
+\begin{thebibliography}{37}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -17,6 +17,11 @@ Jacob L.~S. Bellmund, Peter G{\"a}rdenfors, Edvard~I. Moser, and Christian~F.
   Doeller.
 \newblock Navigating cognition: Spatial codes for human thinking.
 \newblock \emph{Science}, 362\penalty0 (6415):\penalty0 eaat6766, 2018.
+
+\bibitem[Breiman(2001)]{breiman2001}
+Leo Breiman.
+\newblock Random forests.
+\newblock \emph{Machine Learning}, 45\penalty0 (1):\penalty0 5--32, 2001.
 
 \bibitem[Chaudhuri et~al.(2019)Chaudhuri, Ger{\c{c}}ek, Pandey, Peyrache, and
   Fiete]{chaudhuri2019}
@@ -38,16 +43,44 @@ Alexandra~O. Constantinescu, Jill~X. O'Reilly, and Timothy E.~J. Behrens.
 \newblock Organizing conceptual knowledge in humans with a grid-like code.
 \newblock \emph{Science}, 352\penalty0 (6292):\penalty0 1464--1468, 2016.
 
+\bibitem[Cunningham and Yu(2014)]{cunningham2014}
+John~P. Cunningham and Byron~M. Yu.
+\newblock Dimensionality reduction for large-scale neural recordings.
+\newblock \emph{Nature Neuroscience}, 17\penalty0 (11):\penalty0 1500--1509,
+  2014.
+
 \bibitem[Eichenbaum and Cohen(2014)]{eichenbaum2014}
 Howard Eichenbaum and Neal~J. Cohen.
 \newblock Can we reconcile the declarative memory and spatial navigation views
   on hippocampal function?
 \newblock \emph{Neuron}, 83\penalty0 (4):\penalty0 764--770, 2014.
 
+\bibitem[Eichenbaum et~al.(1987)Eichenbaum, Kuperstein, Fagan, and
+  Nagode]{eichenbaum1987}
+Howard Eichenbaum, Menachem Kuperstein, Andrew Fagan, and Janet Nagode.
+\newblock Cue-sampling and goal-approach correlates of hippocampal unit
+  activity in rats performing an odor-discrimination task.
+\newblock \emph{Journal of Neuroscience}, 7:\penalty0 716--732, 1987.
+
+\bibitem[Frank et~al.(2000)Frank, Brown, and Wilson]{frank2000}
+Loren~M. Frank, Emery~N. Brown, and Matthew Wilson.
+\newblock Trajectory encoding in the hippocampus and entorhinal cortex.
+\newblock \emph{Neuron}, 27:\penalty0 169--178, 2000.
+
 \bibitem[Gallego et~al.(2017)Gallego, Perich, Miller, and Solla]{gallego2017}
 Juan~A. Gallego, Matthew~G. Perich, Lee~E. Miller, and Sara~A. Solla.
 \newblock Neural manifolds for the control of movement.
 \newblock \emph{Neuron}, 94\penalty0 (5):\penalty0 978--984, 2017.
+
+\bibitem[Gill et~al.(2011)Gill, Mizumori, and Smith]{gill2011}
+P.~R. Gill, Sheri J.~Y. Mizumori, and David~M. Smith.
+\newblock Hippocampal episode fields develop with learning.
+\newblock \emph{Hippocampus}, 21:\penalty0 1240--1249, 2011.
+
+\bibitem[Herzog et~al.(2019)]{herzog2019}
+Lauren~E. Herzog et~al.
+\newblock Interaction of taste and place coding in the hippocampus.
+\newblock \emph{Journal of Neuroscience}, 39:\penalty0 3057--3069, 2019.
 
 \bibitem[Kingma and Welling(2014)]{kingma2014}
 Diederik~P. Kingma and Max Welling.
@@ -61,6 +94,19 @@ Ryan~J. Low, Sean Lewallen, Dmitriy Aronov, Rachel Nevers, and David~W. Tank.
   neural dynamics.
 \newblock \emph{bioRxiv}, 2018.
 \newblock \doi{10.1101/418939}.
+
+\bibitem[MacDonald et~al.(2011)MacDonald, Lepage, Eden, and
+  Eichenbaum]{macdonald2011}
+Chris~J. MacDonald, Kyle~Q. Lepage, Uri~T. Eden, and Howard Eichenbaum.
+\newblock Hippocampal ``time cells'' bridge the gap in memory for discontiguous
+  events.
+\newblock \emph{Neuron}, 71:\penalty0 737--749, 2011.
+
+\bibitem[McKenzie et~al.(2014)]{mckenzie2014}
+Sam McKenzie et~al.
+\newblock Hippocampal representation of related and opposing memories develop
+  within distinct, hierarchically organized neural schemas.
+\newblock \emph{Neuron}, 83:\penalty0 202--215, 2014.
 
 \bibitem[Nieh et~al.(2021)]{nieh2021}
 Edward~H. Nieh et~al.
@@ -85,12 +131,36 @@ Sang~Ah Park, David~S. Miller, Hamed Nili, Charan Ranganath, and Erie~D.
   cognitive maps.
 \newblock \emph{Neuron}, 107\penalty0 (6):\penalty0 1226--1238.e8, 2020.
 
+\bibitem[Pastalkova et~al.(2008)Pastalkova, Itskov, Amarasingham, and
+  Buzsaki]{pastalkova2008}
+Eva Pastalkova, Vladimir Itskov, A.~Amarasingham, and Gyorgy Buzsaki.
+\newblock Internally generated cell assembly sequences in the rat hippocampus.
+\newblock \emph{Science}, 321:\penalty0 1322--1327, 2008.
+
+\bibitem[Pnevmatikakis and Giovannucci(2017)]{normcorre2017}
+Eftychios~A. Pnevmatikakis and Andrea Giovannucci.
+\newblock Normcorre: An online algorithm for piecewise rigid motion correction
+  of calcium imaging data.
+\newblock \emph{Journal of Neuroscience Methods}, 291:\penalty0 83--94, 2017.
+
+\bibitem[Pnevmatikakis et~al.(2016)]{pnevmatikakis2016}
+Eftychios~A. Pnevmatikakis et~al.
+\newblock Simultaneous denoising, deconvolution, and demixing of calcium
+  imaging data.
+\newblock \emph{Neuron}, 89:\penalty0 285--299, 2016.
+
 \bibitem[Rubanova et~al.(2019)Rubanova, Chen, and Duvenaud]{rubanova2019}
 Yulia Rubanova, Ricky T.~Q. Chen, and David Duvenaud.
 \newblock Latent ordinary differential equations for irregularly-sampled time
   series.
 \newblock In \emph{Advances in Neural Information Processing Systems
   (NeurIPS)}, 2019.
+
+\bibitem[Rubin et~al.(2019)]{rubin2019}
+Amir Rubin et~al.
+\newblock Revealing neural correlates of behavior without behavioral
+  measurements.
+\newblock \emph{Nature Communications}, 10:\penalty0 1--14, 2019.
 
 \bibitem[Russo et~al.(2018)]{russo2018}
 Abigail~A. Russo et~al.
@@ -117,17 +187,40 @@ Kimberly~L. Stachenfeld, Matthew~M. Botvinick, and Samuel~J. Gershman.
 \newblock \emph{Nature Neuroscience}, 20\penalty0 (11):\penalty0 1643--1653,
   2017.
 
+\bibitem[Tavares et~al.(2015)]{tavares2015}
+Rita~M. Tavares et~al.
+\newblock A map for social navigation in the human brain.
+\newblock \emph{Neuron}, 87:\penalty0 231--243, 2015.
+
+\bibitem[Taxidis et~al.(2020)]{taxidis2020}
+Jiannis Taxidis et~al.
+\newblock Differential emergence and stability of sensory and temporal
+  representations in context-specific hippocampal sequences.
+\newblock \emph{Neuron}, 108:\penalty0 984--998.e9, 2020.
+
 \bibitem[Tenenbaum et~al.(2000)Tenenbaum, de~Silva, and
   Langford]{tenenbaum2000}
 Joshua~B. Tenenbaum, Vin de~Silva, and John~C. Langford.
 \newblock A global geometric framework for nonlinear dimensionality reduction.
 \newblock \emph{Science}, 290\penalty0 (5500):\penalty0 2319--2323, 2000.
 
+\bibitem[Tipping and Bishop(1999)]{tipping1999}
+Michael~E. Tipping and Christopher~M. Bishop.
+\newblock Probabilistic principal component analysis.
+\newblock \emph{Journal of the Royal Statistical Society: Series B},
+  61\penalty0 (3):\penalty0 611--622, 1999.
+
 \bibitem[Tolman(1948)]{tolman1948}
 Edward~C. Tolman.
 \newblock Cognitive maps in rats and men.
 \newblock \emph{Psychological Review}, 55\penalty0 (4):\penalty0 189--208,
   1948.
+
+\bibitem[Wood et~al.(2000)Wood, Dudchenko, Robitsek, and Eichenbaum]{wood2000}
+Eric~R. Wood, Paul~A. Dudchenko, Rebekka~J. Robitsek, and Howard Eichenbaum.
+\newblock Hippocampal neurons encode information about different types of
+  memory episodes occurring in the same location.
+\newblock \emph{Neuron}, 27:\penalty0 623--633, 2000.
 
 \bibitem[Yu et~al.(2009)Yu, Cunningham, Santhanam, Ryu, Shenoy, and
   Sahani]{yu2009}
