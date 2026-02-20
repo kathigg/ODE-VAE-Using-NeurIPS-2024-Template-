@@ -1,0 +1,6 @@
+[submodule "neuroscience-code"]
+	path = neuroscience-code
+	url = https://github.com/kathigg/ODE-VAE-Using-NeurIPS-2024-Template-.git
+[submodule "neuroscience"]
+	path = neuroscience
+	url = https://github.com/SchottdorfLab/Neural_VAE_ODE.git
