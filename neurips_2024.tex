@@ -30,7 +30,7 @@
 \maketitle
 
 \begin{abstract}
-Neural population activity traces trajectories in a high-dimensional state space, yet accumulating evidence suggests these trajectories are confined to low-dimensional manifolds that encode both task variables and internal state. Existing manifold inference pipelines can recover geometry and explain variability, but often rely on multi-stage local models and do not impose globally smooth continuous-time dynamics. We develop a latent Neural ODE variational autoencoder (ODE-VAE) that jointly learns (i) a low-dimensional stochastic initial condition, (ii) continuous-time latent dynamics parameterized by a mixture-of-experts ODE, and (iii) a decoder back to neural activity. To better align reconstruction with temporally structured variability, our \texttt{v5} implementation adds transition-consistency regularization in observation space and a soft locally linear embedding (LLE) constraint in latent space. On synthetic random-foraging sequences, the model achieves high reconstruction accuracy (\(R^2=0.9789\)) while exhibiting seed sensitivity. On the E65 hippocampal calcium dataset, we observe moderate reconstruction in archived runs (\(R^2=0.4368\)) and substantial dependence on preprocessing, split strategy, and evaluation space. Together, these results highlight both the promise and current fragility of end-to-end continuous-time manifold models for noisy biological recordings.
+Neural population activity traces trajectories in a high-dimensional state space, yet accumulating evidence suggests these trajectories are confined to low-dimensional manifolds that encode both task variables and internal state. Existing manifold inference pipelines can recover geometry and explain variability, but often rely on multi-stage local models and do not impose globally smooth continuous-time dynamics. We develop a latent Neural ODE variational autoencoder (ODE-VAE) that jointly learns (i) a low-dimensional stochastic initial condition, (ii) continuous-time latent dynamics parameterized by a mixture-of-experts ODE, and (iii) a decoder back to neural activity. To better align reconstruction with temporally structured variability, our \texttt{v5} implementation adds transition-consistency regularization in observation space and a soft locally linear embedding (LLE) constraint in latent space. On synthetic random-foraging sequences, the model achieves high reconstruction accuracy (\(R^2=0.9789\)) while exhibiting seed sensitivity. On the E65 hippocampal calcium dataset, the latest \texttt{v5} baseline run attains final PCA-space reconstruction \(R^2=0.4506\) (best epoch \(R^2=0.4785\)), but performance varies substantially with preprocessing, split strategy, and evaluation space. Together, these results highlight both the promise and current fragility of end-to-end continuous-time manifold models for noisy biological recordings.
 \end{abstract}
 
 \section{Introduction}
@@ -195,7 +195,7 @@ Mean (non-collapsed seeds) & 0.8282 & -- \\
 \end{table}
 
 \subsection{E65 hippocampal data: mixed performance across variants}
-Table~\ref{tab:e65} reports available E65 run metrics for the ODE-VAE family. An archived ODE-VAE run reports \(R^2=0.4368\). In contrast, \texttt{v5} sweep artifacts are substantially lower (best-epoch \(R^2\le 0.0569\), negative final \(R^2\) in three runs), while a no-PCA \texttt{v6} run records \(R^2=0.0956\). These discrepancies are consistent with the codebase supporting multiple evaluation spaces and split protocols; therefore, comparisons across runs should be interpreted cautiously unless the evaluation definition is matched.
+Table~\ref{tab:e65} reports available E65 run metrics for the ODE-VAE family. The most recent run in the repository (\texttt{2026-02-20\_172318\_6880b5b}) achieves a final PCA-space \(R^2=0.4506\) with best-epoch \(R^2=0.4785\). An earlier archived ODE-VAE run reports \(R^2=0.4368\). In contrast, \texttt{v5} sweep artifacts are substantially lower (best-epoch \(R^2\le 0.0569\), negative final \(R^2\) in three runs), while a no-PCA \texttt{v6} run records \(R^2=0.0956\). These discrepancies are consistent with the codebase supporting multiple evaluation spaces and split protocols; therefore, comparisons across runs should be interpreted cautiously unless the evaluation definition is matched.
 
 \begin{table}[t]
 \centering
@@ -205,6 +205,7 @@ Table~\ref{tab:e65} reports available E65 run metrics for the ODE-VAE family. An
 \toprule
 Variant & Space & \(D\) & \(\lambda_{\text{smooth}}\) & Best \(R^2\) & Final \(R^2\) \\
 \midrule
+latest \texttt{v5} baseline & PCA & 5 & \(5\times 10^{-4}\) & 0.4785 & 0.4506 \\
 archived ODE-VAE & PCA & -- & -- & -- & 0.4368 \\
 \texttt{v5} sweep & PCA & 5 & \(5\times 10^{-4}\) & 0.0354 & -0.2391 \\
 \texttt{v5} sweep & PCA & 5 & \(2\times 10^{-4}\) & 0.0353 & -0.1382 \\

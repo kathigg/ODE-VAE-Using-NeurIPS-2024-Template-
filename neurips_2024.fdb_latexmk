@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex neurips_2024"] 1771624786.60692 "neurips_2024.aux" "neurips_2024.bbl" "neurips_2024" 1771624788.73619 0
+["bibtex neurips_2024"] 1771631597.03758 "neurips_2024.aux" "neurips_2024.bbl" "neurips_2024" 1771631598.06514 0
   "./references.bib" 1771624681.5239 10358 e1a42d8c7c73e3ca249b9ac1e8617437 ""
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/natbib/plainnat.bst" 1233624470 26816 ffe5423d2019860bad9f54bc402fac15 ""
-  "neurips_2024.aux" 1771624788.32028 9745 c73aa23136a1371b3d716b1f06ff7de5 "pdflatex"
+  "neurips_2024.aux" 1771631597.83219 9745 df8cda9bea931f595a143f025aa8f1f1 "pdflatex"
   (generated)
   "neurips_2024.bbl"
   "neurips_2024.blg"
   (rewritten before read)
-["pdflatex"] 1771624786.79358 "neurips_2024.tex" "neurips_2024.pdf" "neurips_2024" 1771624788.7364 0
+["pdflatex"] 1771631597.13128 "neurips_2024.tex" "neurips_2024.pdf" "neurips_2024" 1771631598.06526 0
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -131,12 +131,12 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1771618223 5467155 19efa205003f9ecad95fbbaa6ff24da1 ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1741450574 3345740 46b66fdb0378f7bf5921b5eabf1762b8 ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "neurips_2024.aux" 1771624788.32028 9745 c73aa23136a1371b3d716b1f06ff7de5 "pdflatex"
-  "neurips_2024.bbl" 1771624786.78969 10188 16c5008b0e0b2b0369475201a3a3ee88 "bibtex neurips_2024"
-  "neurips_2024.out" 1771624788.32162 5534 4312c77f69d94887be2ac8b2ffabae54 "pdflatex"
+  "neurips_2024.aux" 1771631597.83219 9745 df8cda9bea931f595a143f025aa8f1f1 "pdflatex"
+  "neurips_2024.bbl" 1771631597.12938 10188 16c5008b0e0b2b0369475201a3a3ee88 "bibtex neurips_2024"
+  "neurips_2024.out" 1771631597.83299 5534 4312c77f69d94887be2ac8b2ffabae54 "pdflatex"
   "neurips_2024.sty" 1771541264.15919 11625 b5f853b54a7a098e9e5b837f826d5daa ""
-  "neurips_2024.tex" 1771624774.05927 28134 239bdb62cd2ce192017b58bda82f92b4 ""
-  "neuroscience/src/pt_files/latent_manifold_mds.png" 1771606680.89048 131025 1eb3eca6935f46cf2aaf55f452522f26 ""
+  "neurips_2024.tex" 1771631589.98468 28436 02296d5ea110471b462ffafc3a4c4e99 ""
+  "neuroscience/src/pt_files/latent_manifold_mds.png" 1771625176.39247 129903 9cfea06f31a07a53156bb5a022cf3623 ""
   (generated)
   "neurips_2024.aux"
   "neurips_2024.log"
