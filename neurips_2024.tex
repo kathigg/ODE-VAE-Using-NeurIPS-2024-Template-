@@ -155,6 +155,38 @@ Default parameters: \(k=8\), \(M\le 256\), \(\tau=0.1\).
 \end{equation}
 The KL coefficient \(\beta_t\) is warmed up over 30 epochs to a final value \(\beta=0.02\).
 
+\section{Versioned Model Development and Failure Modes}
+The repository contains a sequence of incrementally modified training scripts that reflect both model and pipeline iteration: the current implementation is \texttt{v5\_neural\_vae.py} and earlier variants are archived under \texttt{neuroscience/src/archived\_ode\_models/}. These versions should not be interpreted as a clean ablation study: they differ in architecture, preprocessing, evaluation space, solver choices, and logging conventions. Nevertheless, documenting this evolution is useful for understanding observed fragilities and for motivating the \texttt{v5} regularizers, which are directly inspired by the geometry- and transition-aware components of the MIND pipeline \citep{low2018,saul2003}.
+
+\paragraph{\texttt{v1}: baseline latent Neural ODE-VAE.}
+\texttt{v1} implements the minimal continuous-time VAE setup \citep{kingma2014,chen2018}: an MLP encoder of \(x(t_1)\), a single latent vector field \(f_\theta\), an MLP decoder, and an \(\ell_2\) smoothness penalty on finite-difference latent velocities. It also introduces global PCA preprocessing and greedy landmark selection, mirroring common manifold inference practice \citep{low2018}.
+\emph{Vulnerabilities:} (i) PCA is fit on the full recording before the train/val split, which can leak test-set structure into the representation; (ii) landmark selection is performed on flattened time points and mapped back to trials via a modulo operation, which can duplicate trials and bias the subsample away from true trial-level coverage; (iii) the default ``last-\(K\) trials'' holdout is sensitive to nonstationarities or ordering effects.
+\emph{Motivation for \texttt{v2}:} reduce protocol-induced optimism by splitting first and fitting normalization/PCA only on training data, and explore more expressive dynamics.
+
+\paragraph{\texttt{v2}: switching/gated latent dynamics with train-only preprocessing.}
+\texttt{v2} adds a learned gating network over multiple candidate latent vector fields (a switching/mixture-style dynamics), increasing expressivity beyond a single global \(f_\theta\). Crucially, \texttt{v2} builds raw trial sequences first, then performs the train/val split, and fits both standardization and PCA on training data only; evaluation reconstructs back to raw ROI space via inverse PCA before scoring, which is closer to MIND-style reporting \citep{low2018}.
+\emph{Vulnerabilities:} (i) time normalization to \([0,1]\) is disabled in the script, which changes the effective scale seen by the ODE solver and can make optimization more sensitive; (ii) gating dynamics introduce additional nonconvexity and can collapse to a single expert without careful tuning.
+\emph{Motivation for \texttt{v3}:} incorporate mixture-of-experts dynamics and richer decoders to better capture heterogeneous neural tuning and trial-to-trial variability.
+
+\paragraph{\texttt{v3}: mixture-of-experts latent ODE and decoder variants.}
+\texttt{v3} introduces a mixture-of-experts latent vector field (soft gating over multiple \(f_e\)) and a family of decoders (neuron-aware, local-attention, and MoE decoders) intended to better model neuron-specific heterogeneity. It also adds an optional per-trial baseline correction (subtracting early-bin means) to reduce drift/offset burden on the latent state.
+\emph{Vulnerabilities:} (i) the preprocessing/evaluation pipeline reverts to full-session PCA and PCA-space scoring, making results harder to compare to raw-space metrics and potentially optimistic; (ii) the flattened-time landmark subsampling and last-\(K\) holdout issues from \texttt{v1} persist; (iii) added model capacity increases overfitting risk when validation is extremely small.
+\emph{Motivation for \texttt{v4}:} refine the decoder locality bias and improve hardware compatibility (notably Apple MPS) while keeping the MoE latent dynamics.
+
+\paragraph{\texttt{v4}: MoE latent dynamics with locality-biased decoders (MPS-safe).}
+\texttt{v4} largely preserves \texttt{v3}'s MoE latent dynamics and decoder choices, and emphasizes MPS-safe ODE integration (fixed-step fallbacks) to reduce device-specific solver failures during experimentation.
+\emph{Vulnerabilities:} decoder ``locality'' is primarily architectural (attention-like) rather than enforced by an explicit geometric objective, and the pipeline-level issues (PCA leakage, trial subsampling bias, small/ordered holdout) remain.
+\emph{Motivation for \texttt{v5}:} add explicit constraints that directly regularize temporal transitions and local manifold geometry, closer in spirit to MIND's use of transition structure and neighborhood geometry \citep{low2018,saul2003}.
+
+\paragraph{\texttt{v5}: transition consistency + soft-LLE geometry regularization.}
+The current \texttt{v5} model retains MoE latent dynamics and MoE decoding while adding two explicit regularizers: (i) a transition-consistency loss in observation space that matches \(\Delta \hat{x}(t)\) to \(\Delta x(t)\) and (ii) a soft LLE penalty that encourages each latent point to be reconstructible from its \(k\)-NN neighborhood \citep{saul2003}. Both are motivated by the observation that reconstruction alone can ignore fine-grained temporal and local geometric structure, which MIND leverages via transition-aware distances and local mappings \citep{low2018}.
+\emph{Vulnerabilities:} (i) the default training script still subsamples training data using flattened-time landmark selection and uses a small ordered validation set, amplifying sensitivity to preprocessing and random seed; (ii) the codebase supports multiple evaluation spaces (PCA vs raw), so reported \(R^2\) values are not directly comparable unless the evaluation definition is matched; (iii) the \texttt{v5} checkpoint-saving logic contains a minor best-model saving bug (the ``best'' condition is checked again after updating the best value), which can prevent true best checkpoints from being written and complicate retrospective comparisons.
+\emph{Motivation for \texttt{v6}:} test whether PCA-space training masks raw-space reconstruction error by training and scoring directly in raw neuron space.
+
+\paragraph{\texttt{v6}: no-PCA, raw-space variant.}
+\texttt{v6} is a \texttt{v5}-style variant that bypasses PCA and optimizes reconstruction directly in the original ROI space. This makes the metric closer to the scientific target and avoids ambiguity about the evaluation space.
+\emph{Vulnerabilities:} raw-space optimization is substantially higher-dimensional and noisier, which can reduce stability and yield lower \(R^2\) without additional noise modeling or stronger inductive biases; it also makes comparisons to PCA-trained runs nontrivial unless preprocessing is standardized.
+
 \section{Experimental Protocol}
 \subsection{Configurations}
 Main \texttt{v5} settings from \texttt{config.txt}: latent dimension \(D=5\) (with a sweep to \(D=8\)), batch size 8, 150 epochs, Adam optimizer (learning rate 0.002, weight decay \(10^{-5}\)), \(\lambda_{\text{smooth}}\in\{5\times10^{-4},2\times10^{-4}\}\), \(\lambda_{\text{trans}}=0.01\) with a 30-epoch warmup, \(\lambda_{\text{LLE}}=0.01\), landmark count 100, and baseline correction enabled.

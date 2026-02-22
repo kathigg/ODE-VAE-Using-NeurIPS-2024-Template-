@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  20 FEB 2026 18:53
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  21 FEB 2026 13:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -685,40 +685,47 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10> not available
 [4]
 
 [5]
-<neuroscience/src/pt_files/latent_manifold_mds.png, id=341, 433.62pt x 361.35pt
+
+[6]
+<neuroscience/src/pt_files/latent_manifold_mds.png, id=379, 433.62pt x 361.35pt
 >
 File: neuroscience/src/pt_files/latent_manifold_mds.png Graphic file (type png)
 
 <use neuroscience/src/pt_files/latent_manifold_mds.png>
 Package pdftex.def Info: neuroscience/src/pt_files/latent_manifold_mds.png  use
-d on input line 223.
+d on input line 255.
 (pdftex.def)             Requested size: 246.43874pt x 205.36513pt.
 
 
-[6 <./neuroscience/src/pt_files/latent_manifold_mds.png>]
+[7]
 
-[7] (./neurips_2024.bbl
+[8 <./neuroscience/src/pt_files/latent_manifold_mds.png>]
+Underfull \vbox (badness 1701) has occurred while \output is active []
 
-[8]
 
-[9])
 
-[10] (./neurips_2024.aux)
+[9] (./neurips_2024.bbl
+
+[10]
+
+[11])
+
+[12] (./neurips_2024.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `neurips_2024.out' has not changed.
-(rerunfilecheck)             Checksum: 4312C77F69D94887BE2AC8B2FFABAE54;5534.
+(rerunfilecheck)             Checksum: B5BC8420427F6A8ADD5365D4F1AC747F;5831.
  ) 
 Here is how much of TeX's memory you used:
- 18298 strings out of 473190
- 344003 string characters out of 5715801
+ 18345 strings out of 473190
+ 344471 string characters out of 5715801
  751964 words of memory out of 5000000
- 41012 multiletter control sequences out of 15000+600000
- 599440 words of font info for 202 fonts, out of 8000000 for 9000
+ 41016 multiletter control sequences out of 15000+600000
+ 601648 words of font info for 225 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 72i,13n,79p,1507b,1213s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,13n,79p,1507b,1237s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
 ></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></
@@ -729,15 +736,16 @@ al/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/t
 exlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/tex
 live/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local
-/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb></usr/local/t
-exlive/2025/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/
-2025/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2025/texmf
--dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/font
-s/type1/urw/times/utmri8a.pfb>
-Output written on neurips_2024.pdf (10 pages, 363404 bytes).
+/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfit1000.pfb></usr/local/t
+exlive/2025/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb></usr/local/tex
+live/2025/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/20
+25/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2025/texmf-d
+ist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/
+type1/urw/times/utmri8a.pfb>
+Output written on neurips_2024.pdf (12 pages, 386243 bytes).
 PDF statistics:
- 506 PDF objects out of 1000 (max. 8388607)
- 457 compressed objects within 5 object streams
- 106 named destinations out of 1000 (max. 500000)
- 45262 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 555 PDF objects out of 1000 (max. 8388607)
+ 501 compressed objects within 6 object streams
+ 115 named destinations out of 1000 (max. 500000)
+ 45782 words of extra memory for PDF output out of 51595 (max. 10000000)
 
