@@ -1,6 +1,6 @@
 \documentclass{article}
 
-% For NeurIPS: omit the option for anonymized submission (with line numbers),
+% Omit the option for anonymized submission (with line numbers),
 % and use [final] for the camera-ready version (no line numbers).
 \usepackage[final]{neurips_2024}
 \usepackage[utf8]{inputenc}
@@ -35,7 +35,7 @@
 \maketitle
 
 \begin{abstract}
-Neural population activity traces trajectories in a high-dimensional state space, yet accumulating evidence suggests these trajectories are confined to low-dimensional manifolds that encode both task variables and internal state. Existing manifold inference pipelines can recover geometry and explain variability, but often rely on multi-stage local models and do not impose globally smooth continuous-time dynamics. We develop a latent Neural ODE variational autoencoder (ODE-VAE) that jointly learns (i) a low-dimensional stochastic initial condition, (ii) continuous-time latent dynamics parameterized by a mixture-of-experts ODE, and (iii) a decoder back to neural activity. To better align reconstruction with temporally structured variability, we augment the variational objective with transition-consistency regularization in observation space and a soft locally linear embedding (LLE) constraint in latent space. To reduce evaluation optimism on biological recordings, we split trials before fitting any normalization (and optional PCA) transforms, ensuring train-only preprocessing. On synthetic random-foraging sequences, the model achieves high reconstruction accuracy (\(R^2=0.9789\)). On the E65 hippocampal calcium dataset, a recent raw-space run (no PCA; latent dimension \(D=7\)) attains Pearson correlation \(r=0.7794\) and reconstruction \(R^2=0.6049\). Together, these results highlight both the promise and current fragility of end-to-end continuous-time manifold models for noisy biological recordings.
+Neural population activity traces trajectories in a high-dimensional state space, yet accumulating evidence suggests these trajectories are confined to low-dimensional manifolds that encode both task variables and internal state. Existing manifold inference pipelines can recover geometry and explain variability, but often rely on multi-stage local models and do not impose globally smooth continuous-time dynamics. We develop a latent Neural ODE variational autoencoder (ODE-VAE) that jointly learns (i) a low-dimensional stochastic initial condition, (ii) continuous-time latent dynamics parameterized by a mixture-of-experts ODE, and (iii) a decoder back to neural activity. To better align reconstruction with temporally structured variability, we augment the variational objective with transition-consistency regularization in observation space and an LLE-inspired neighborhood reconstruction constraint in latent space. To reduce evaluation optimism on biological recordings, we split trials before fitting any normalization (and optional PCA) transforms, ensuring train-only preprocessing. On synthetic random-foraging sequences, the model achieves high reconstruction accuracy (\(R^2=0.9789\)). On the E65 hippocampal calcium dataset, a recent raw-space run (no PCA; latent dimension \(D=7\)) attains Pearson correlation \(r=0.7794\) and reconstruction \(R^2=0.6049\). Together, these results highlight both the promise and current fragility of end-to-end continuous-time manifold models for noisy biological recordings.
 \end{abstract}
 
 \section{Introduction}
@@ -44,12 +44,12 @@ Neural activity can be described as a point in a high-dimensional coordinate sys
 Nonlinear dimensionality reduction has demonstrated that neural population activity can often be described by 4--6 latent variables, suggesting that activity is constrained to a low-dimensional neural manifold that displays a geometric representation of both physical and abstract variables \citep{low2018,chaudhuri2019,nieh2021}. Existing approaches are limited to multi-stage machine-learning pipelines, using forest-based transition models (with probabilistic principal component analysis in decision-tree leaves) to define distances between population states, which are then embedded into a low-dimensional manifold and mapped back to neural activity for reconstruction \citep{low2018,tipping1999,breiman2001,tenenbaum2000,yu2009}. This piecewise approach partitions state space and models dynamics locally, hence lacking explicit enforcement of globally smooth latent dynamics and can exhibit saturation of reconstruction decoding performance with low-dimensional embeddings \citep{low2018}. Thus, we hypothesize that generative deep learning models offer a complementary framework: neural network architectures can be trained directly on biological neural population recordings to jointly learn low-dimensional latent coordinates, their temporal evolution, and the mapping back to neural activity \citep{kingma2014,chen2018,rubanova2019}.
 
 In this paper, we propose a novel approach to modeling the neural manifold by constructing a Neural Ordinary Differential Equation variational autoencoder (ODE-VAE): a deep generative model that (i) encodes high-dimensional population activity into a low-dimensional latent state, (ii) models the evolution of that latent state as a continuous-time dynamical system parameterized by a neural ODE, and (iii) decodes the resulting latent trajectory back into neural activity \citep{kingma2014,chen2018,rubanova2019}. By training the encoder, dynamics, and decoder end-to-end under a variational objective, this approach aims to capture nonlinear manifold structure while imposing smooth temporal dynamics.
-Our implementation uses mixture-of-experts latent dynamics and adds two regularizers inspired by manifold inference---transition-consistency in observation space and a soft locally linear embedding (LLE) constraint in latent space \citep{low2018,saul2003}. We evaluate this family on synthetic and hippocampal calcium datasets and analyze the sensitivity of performance to preprocessing and evaluation choices.
+Our implementation uses mixture-of-experts latent dynamics and adds two regularizers inspired by manifold inference---transition-consistency in observation space and an LLE-inspired neighborhood reconstruction constraint in latent space \citep{low2018,saul2003}. We evaluate this family on synthetic and hippocampal calcium datasets and analyze the sensitivity of performance to preprocessing and evaluation choices.
 
 \paragraph{Contributions.}
 \begin{itemize}
 \item We formalize an ODE-VAE for trialized population sequences with mixture-of-experts latent dynamics and explicit geometric regularizers.
-\item We implement this formulation in a versioned codebase (\texttt{v1--v6}) and highlight a current configuration with train-only preprocessing, transition consistency, and soft-LLE regularization.
+\item We implement this formulation in a versioned codebase (\texttt{v1--v5}) and highlight a current configuration with train-only preprocessing, transition consistency, and an LLE-inspired neighborhood reconstruction regularizer.
 \item We provide a reproducible evaluation on synthetic and hippocampal calcium datasets and identify protocol factors that strongly affect reconstruction metrics.
 \end{itemize}
 
@@ -98,14 +98,15 @@ In our current configuration, \((\mu_b,\log\sigma_b^2)\) are produced by a Trans
 \subsection{Continuous-time latent dynamics}
 Latent trajectories are generated by a neural ODE:
 \begin{equation}
-\frac{dz_b(t)}{dt} = f_\theta(z_b(t), t), \qquad z_b(t_1)=z_{0,b}.
+\frac{dz_b(t)}{dt} = f_\theta(z_b(t)), \qquad z_b(t_1)=z_{0,b}.
 \end{equation}
 We parameterize \(f_\theta\) as a mixture of experts:
 \begin{equation}
-f_\theta(z,t) = \sum_{e=1}^{E} \pi_e(z) f_e(z), \qquad
+f_\theta(z) = \sum_{e=1}^{E} \pi_e(z) f_e(z), \qquad
 \pi(z)=\operatorname{softmax}(g(z)),
 \end{equation}
-with \(E=4\) latent experts by default.
+In the reported experiments, this defines an autonomous ODE (no explicit dependence on \(t\)); time dependence can be introduced by conditioning the gate and experts on a learned embedding of \(t\).
+We use \(E=4\) latent experts by default.
 Each expert \(f_e:\mathbb{R}^D\to\mathbb{R}^D\) is an MLP and \(\pi_e(z)\in[0,1]\) are gating weights satisfying \(\sum_e \pi_e(z)=1\).
 
 \subsection{Decoder family}
@@ -116,7 +117,7 @@ A decoder maps latent states back to observations:
 The codebase supports MLP, neuron-aware, local-attention, and mixture-of-experts (MoE) decoders; our current configuration uses an MoE decoder with 8 decoder experts. In all cases, \(g_\psi:\mathbb{R}^D\to\mathbb{R}^{P}\) outputs the mean of a factorized Gaussian observation model in the chosen observation space.
 
 \section{Training Objective and Regularization}
-We optimize a variational objective with auxiliary regularizers. Under a Gaussian observation model \(p_\psi(x_b(t_\ell)\mid z_b(t_\ell))=\mathcal{N}(g_\psi(z_b(t_\ell)),\sigma^2 I)\) with fixed \(\sigma^2\), maximizing the ELBO corresponds (up to constants and a scale factor) to minimizing mean-squared reconstruction error plus a KL penalty.
+We optimize a variational objective with auxiliary regularizers. Under a Gaussian observation model \(p_\psi(x_b(t_\ell)\mid z_b(t_\ell))=\mathcal{N}(g_\psi(z_b(t_\ell)),\sigma^2 I)\) with fixed \(\sigma^2\), maximizing the standard ELBO (\(\beta=1\)) corresponds (up to constants and a scale factor) to minimizing mean-squared reconstruction error plus a KL penalty. In our experiments we use a weighted-KL variant (\(\beta\)-VAE), with \(\beta_t\) warmed up to a final \(\beta\).
 
 The base objective combines reconstruction and KL terms:
 \begin{equation}
@@ -129,13 +130,13 @@ where
 \begin{equation}
 \mathcal{L}_{\text{KL}} = \frac{1}{B}\sum_b D_{\text{KL}}\big(q_\phi(z_{0,b}\mid X_b)\,\|\,\mathcal{N}(0,I)\big).
 \end{equation}
-Equivalently, the (negative) ELBO per trial is
+Equivalently, the (negative) \(\beta\)-VAE objective per trial is
 \begin{equation}
-\mathcal{L}_{\text{ELBO}} =
+\mathcal{L}_{\beta\text{-VAE}} =
 -\mathbb{E}_{q_\phi(z_{0,b}\mid X_b)}\Big[\sum_{\ell=1}^{L}\log p_\psi(x_b(t_\ell)\mid z_b(t_\ell))\Big]
 +\beta\,D_{\mathrm{KL}}\big(q_\phi(z_{0,b}\mid X_b)\,\|\,p(z_{0,b})\big),
 \end{equation}
-with prior \(p(z_{0,b})=\mathcal{N}(0,I)\). In practice, the code uses a single Monte Carlo sample of \(z_{0,b}\) per trial and minibatch.
+which reduces to the negative ELBO when \(\beta=1\). We use prior \(p(z_{0,b})=\mathcal{N}(0,I)\). In practice, the code uses a single Monte Carlo sample of \(z_{0,b}\) per trial and minibatch.
 
 \paragraph{Smoothness regularization.}
 \begin{equation}
@@ -150,14 +151,15 @@ with prior \(p(z_{0,b})=\mathcal{N}(0,I)\). In practice, the code uses a single 
 \end{equation}
 This term is linearly warmed up for the first 30 epochs.
 
-\paragraph{Soft LLE latent regularization.}
-For flattened latent points \(\{z_i\}_{i=1}^{M_{\mathrm{LLE}}}\subset\mathbb{R}^D\), with \(k\)-NN set \(\mathcal{N}_k(i)\), we add a soft locally linear embedding penalty \citep{saul2003}:
+\paragraph{LLE-inspired neighborhood reconstruction regularization.}
+For flattened latent points \(\{z_i\}_{i=1}^{M_{\mathrm{LLE}}}\subset\mathbb{R}^D\), with \(k\)-NN set \(\mathcal{N}_k(i)\), we add a neighborhood reconstruction penalty inspired by locally linear embedding (LLE) \citep{saul2003}:
 \begin{equation}
 \mathcal{L}_{\text{LLE}} = \frac{1}{M_{\mathrm{LLE}}D}\sum_{i=1}^{M_{\mathrm{LLE}}}
 \left\|z_i-\sum_{j\in\mathcal{N}_k(i)}w_{ij}z_j\right\|_2^2,
 \quad
-w_{ij}\propto\exp\!\left(-\frac{\|z_i-z_j\|_2}{\tau}\right).
+w_{ij}=\frac{\exp\!\left(-\frac{\|z_i-z_j\|_2}{\tau}\right)}{\sum_{j'\in\mathcal{N}_k(i)}\exp\!\left(-\frac{\|z_i-z_{j'}\|_2}{\tau}\right)}.
 \end{equation}
+Unlike classical LLE, we do not solve for per-point constrained least-squares weights; instead we use kernel-normalized weights, yielding a simple differentiable local-consistency regularizer.
 Default parameters: \(k=8\), \(M_{\mathrm{LLE}}\le 256\), \(\tau=0.1\).
 
 \paragraph{Total loss.}
@@ -170,7 +172,7 @@ Default parameters: \(k=8\), \(M_{\mathrm{LLE}}\le 256\), \(\tau=0.1\).
 The KL coefficient \(\beta_t\) is warmed up over 30 epochs to a final value \(\beta=0.02\).
 
 \section{Versioned Model Development and Failure Modes}
-The repository contains a sequence of incrementally modified training scripts that reflect both model and pipeline iteration: the current implementation lives in \texttt{v5\_neural\_vae.py} and earlier variants are archived under \texttt{neuroscience/src/archived\_ode\_models/}. These versions should not be interpreted as a clean ablation study: they differ in architecture, preprocessing, evaluation space, solver choices, and logging conventions. Nevertheless, documenting this evolution is useful for understanding observed fragilities and for motivating the transition and soft-LLE regularizers, which are directly inspired by the geometry- and transition-aware components of the MIND pipeline \citep{low2018,saul2003}.
+The repository contains a sequence of incrementally modified training scripts that reflect both model and pipeline iteration: the current implementation lives in \texttt{v5\_neural\_vae.py} and earlier variants are archived under \texttt{neuroscience/src/archived\_ode\_models/}. These versions should not be interpreted as a clean ablation study: they differ in architecture, preprocessing, evaluation space, solver choices, and logging conventions. Nevertheless, documenting this evolution is useful for understanding observed fragilities and for motivating the transition and neighborhood reconstruction regularizers, which are directly inspired by the geometry- and transition-aware components of the MIND pipeline \citep{low2018,saul2003}.
 
 \paragraph{\texttt{v1}: baseline latent Neural ODE-VAE.}
 \texttt{v1} implements the minimal continuous-time VAE setup \citep{kingma2014,chen2018}: an MLP encoder of \(x(t_1)\), a single latent vector field \(f_\theta\), an MLP decoder, and an \(\ell_2\) smoothness penalty on finite-difference latent velocities. It also introduces global PCA preprocessing and greedy landmark selection, mirroring common manifold inference practice \citep{low2018}.
@@ -192,8 +194,8 @@ The repository contains a sequence of incrementally modified training scripts th
 \emph{Vulnerabilities:} decoder ``locality'' is primarily architectural (attention-like) rather than enforced by an explicit geometric objective, and the pipeline-level issues (PCA leakage, trial subsampling bias, small/ordered holdout) remain.
 \emph{Motivation for \texttt{v5}:} add explicit constraints that directly regularize temporal transitions and local manifold geometry, closer in spirit to MIND's use of transition structure and neighborhood geometry \citep{low2018,saul2003}.
 
-\paragraph{\texttt{v5}: transition consistency + soft-LLE geometry regularization.}
-The current model retains MoE latent dynamics and MoE decoding while adding two explicit regularizers: (i) a transition-consistency loss in observation space that matches \(\Delta \hat{x}(t)\) to \(\Delta x(t)\) and (ii) a soft LLE penalty that encourages each latent point to be reconstructible from its \(k\)-NN neighborhood \citep{saul2003}. Both are motivated by the observation that reconstruction alone can ignore fine-grained temporal and local geometric structure, which MIND leverages via transition-aware distances and local mappings \citep{low2018}.
+\paragraph{\texttt{v5}: transition consistency + neighborhood reconstruction regularization.}
+The current model retains MoE latent dynamics and MoE decoding while adding two explicit regularizers: (i) a transition-consistency loss in observation space that matches \(\Delta \hat{x}(t)\) to \(\Delta x(t)\) and (ii) an LLE-inspired neighborhood reconstruction penalty that encourages each latent point to be reconstructible from its \(k\)-NN neighborhood \citep{saul2003}. Both are motivated by the observation that reconstruction alone can ignore fine-grained temporal and local geometric structure, which MIND leverages via transition-aware distances and local mappings \citep{low2018}.
 \emph{Vulnerabilities:} (i) the default training script still subsamples training data using flattened-time landmark selection and uses a small ordered validation set, amplifying sensitivity to preprocessing and random seed; (ii) the codebase supports multiple evaluation spaces (PCA vs raw), so reported \(R^2\) values are not directly comparable unless the evaluation definition is matched.
 
 \section{Experimental Protocol}
@@ -218,6 +220,7 @@ Metrics can be computed either in raw ROI space or in PCA space. When PCA is ena
 \section{Results}
 \subsection{E65 hippocampal data: effect of preprocessing and evaluation space}
 Runs in this repository differ not only in model capacity but also in \emph{where} reconstruction is optimized and \emph{where} metrics are computed (raw ROI space vs.\ PCA space). Table~\ref{tab:e65} reports the latest E65 metrics for three closely matched ODE-VAE runs (all share the same hyperparameters and no-leakage preprocessing) that differ only by whether PCA is applied (\texttt{use\_pca}) and whether metrics are computed in raw vs.\ PCA space (\texttt{eval\_metrics\_pca}). Training in PCA space but scoring in raw ROI space (\texttt{2026-02-22\_155529\_e7f3cc6}) yields \(R^2=0.4010\), whereas training and scoring in raw ROI space (no PCA; \texttt{2026-02-22\_160802\_b03d3ed}) improves to \(R^2=0.6049\). Scoring in PCA space (\texttt{2026-02-22\_155909\_e7f3cc6}) produces higher values (\(R^2=0.7241\)), but these are not directly comparable to raw-space metrics because PCA compresses and reweights variance. For context, Table~\ref{tab:e65} also includes a MIND baseline \citep{low2018}; note that MIND uses a random 90/10 split while our default ODE-VAE evaluation holds out the last 3 trials.
+Figure~\ref{fig:learning_curve} shows the corresponding learning curve for the raw-space run.
 
 \begin{table}[t]
 \centering
@@ -227,7 +230,7 @@ Runs in this repository differ not only in model capacity but also in \emph{wher
 \toprule
 Method & Train & Eval & Dim & \(r\) & \(R^2\) \\
 \midrule
-MIND \citep{low2018} & PCA & raw & 10 & 0.7509 & 0.5637 \\
+MIND \citep{low2018} & PCA & raw & 7 & 0.7237 & 0.5236 \\
 ODE-VAE (PCA \(\rightarrow\) raw) & PCA & raw & 7 & 0.6658 & 0.4010 \\
 ODE-VAE (raw \(\rightarrow\) raw) & raw & raw & 7 & 0.7794 & 0.6049 \\
 ODE-VAE (PCA \(\rightarrow\) PCA) & PCA & PCA & 7 & 0.8627 & 0.7241 \\
@@ -235,13 +238,20 @@ ODE-VAE (PCA \(\rightarrow\) PCA) & PCA & PCA & 7 & 0.8627 & 0.7241 \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\linewidth]{neuroscience/figures/learning_curve_2026-02-22_160802_b03d3ed.png}
+\caption{Learning curve for the E65 raw \(\rightarrow\) raw run (\texttt{2026-02-22\_160802\_b03d3ed}).}
+\label{fig:learning_curve}
+\end{figure}
+
 \subsection{Manifold interpretability}
 The codebase saves latent manifold projections (MDS) and reconstruction diagnostics for each run. Figure~\ref{fig:manifold} shows an example latent trajectory embedding from the trained model artifacts.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.62\linewidth]{neuroscience/src/pt_files/latent_manifold_mds.png}
-\caption{Latent manifold embedding produced by the ODE-VAE analysis pipeline.}
+\includegraphics[width=0.62\linewidth]{neuroscience/figures/latent_manifold_mds_2026-02-22_160802_b03d3ed.png}
+\caption{Latent manifold embedding (MDS) produced by the ODE-VAE analysis pipeline (\texttt{2026-02-22\_160802\_b03d3ed}).}
 \label{fig:manifold}
 \end{figure}
 
@@ -290,17 +300,17 @@ using the PCA loading matrix \(W_{\mathrm{PCA}}\) and mean \(\mu\) from preproce
 \subsection{Make latent dynamics probabilistic to better match MIND transition structure}
 MIND estimates transition structure via a probabilistic model of next-step activity (a PPCA regression forest) and then derives a random-walk geometry from transition probabilities \citep{low2018,tipping1999,breiman2001}. Our latent ODE is deterministic given \(z_{0,b}\), which can be brittle when real data exhibit unmodeled inputs, nonstationarities, or observation noise.
 A natural extension is to introduce process noise (Neural SDEs) or discrete-time stochastic residuals,
-\(z(t_{\ell+1}) = z(t_\ell) + \int_{t_\ell}^{t_{\ell+1}} f_\theta(z(t),t)\,dt + \eta_\ell\),
+\(z(t_{\ell+1}) = z(t_\ell) + \int_{t_\ell}^{t_{\ell+1}} f_\theta(z(t))\,dt + \eta_\ell\),
 which can absorb variability not explained by the initial condition while retaining smooth latent structure. This direction also creates a clearer conceptual bridge between ODE-based dynamics and MIND's transition-probability graph.
 
-\subsection{Geometry-aware objectives beyond soft-LLE}
-Our current soft-LLE penalty encourages local linearity in the learned latent point cloud, but it does not directly use transition structure. The MIND code constructs local distances from transition probabilities (e.g., \(d_{ij}\propto \sqrt{-\log p_{ij}}\)) and then computes geodesic distances on the resulting graph before embedding \citep{low2018}. This is conceptually related to geodesic-distance embeddings in nonlinear dimensionality reduction \citep{tenenbaum2000}. A promising direction is to import this idea as a regularizer: estimate a transition graph among landmarked latent points, compute a random-walk geodesic distance matrix, and penalize distortions between these distances and Euclidean distances in the latent embedding. Such a constraint could encourage the latent representation to respect the sequential structure that MIND leverages, while still permitting an end-to-end generative model.
+\subsection{Geometry-aware objectives beyond neighborhood reconstruction}
+Our current neighborhood reconstruction penalty encourages local consistency in the learned latent point cloud, but it does not directly use transition structure. The MIND code constructs local distances from transition probabilities (e.g., \(d_{ij}\propto \sqrt{-\log p_{ij}}\)) and then computes geodesic distances on the resulting graph before embedding \citep{low2018}. This is conceptually related to geodesic-distance embeddings in nonlinear dimensionality reduction \citep{tenenbaum2000}. A promising direction is to import this idea as a regularizer: estimate a transition graph among landmarked latent points, compute a random-walk geodesic distance matrix, and penalize distortions between these distances and Euclidean distances in the latent embedding. Such a constraint could encourage the latent representation to respect the sequential structure that MIND leverages, while still permitting an end-to-end generative model.
 
 \section{Limitations and Reproducibility}
-This study is bounded by the available run artifacts and inherits version-specific logging differences. In particular, some run files report ``best'' and ``final'' \(R^2\) under different conditions, and not all checkpoints include identical metadata fields. We therefore report values exactly as saved in each artifact path. The implementation also exhibits training fragility (including occasional NaN divergence), which should be addressed before drawing definitive biological conclusions.
+This study is bounded by the available run artifacts and inherits version-specific logging differences. In particular, some run files report ``best'' and ``final'' \(R^2\) under different conditions, and not all checkpoints include identical metadata fields. We therefore report values exactly as saved in each artifact path. Moving forward, two priorities are (i) systematic sweeps over latent dimension and (ii) matching evaluation protocols (trial splits, preprocessing, and metric definitions) to enable one-to-one comparisons across runs and methods. The implementation also exhibits training fragility (including occasional NaN divergence), which should be addressed before drawing definitive biological conclusions.
 
 \section{Conclusion}
-We presented a mathematically grounded latent Neural ODE-VAE framework for neural manifold modeling and analyzed a sequence of model variants (\texttt{v1--v6}). The method can recover smooth low-dimensional dynamics and high synthetic reconstruction quality, but real-data performance remains sensitive to preprocessing and evaluation protocol. This work provides a formal foundation and concrete directions for improving robustness of ODE-VAE manifold modeling for neuroscience.
+We presented a mathematically grounded latent Neural ODE-VAE framework for neural manifold modeling and analyzed a sequence of model variants (\texttt{v1--v5}). The method can recover smooth low-dimensional dynamics and high synthetic reconstruction quality, but real-data performance remains sensitive to preprocessing and evaluation protocol. This work provides a formal foundation and concrete directions for improving robustness of ODE-VAE manifold modeling for neuroscience.
 
 \bibliographystyle{plainnat}
 \bibliography{references}

@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex neurips_2024"] 1771807753.01132 "neurips_2024.aux" "neurips_2024.bbl" "neurips_2024" 1771807754.7937 0
+["bibtex neurips_2024"] 1771810189.86187 "neurips_2024.aux" "neurips_2024.bbl" "neurips_2024" 1771810190.81956 0
   "./references.bib" 1771624681.5239 10358 e1a42d8c7c73e3ca249b9ac1e8617437 ""
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/natbib/plainnat.bst" 1233624470 26816 ffe5423d2019860bad9f54bc402fac15 ""
-  "neurips_2024.aux" 1771807754.38873 10574 2a203f9c04c182f2a8478939cbeeeb7c "pdflatex"
+  "neurips_2024.aux" 1771810190.60605 10628 c6a8f30704af8c2856a10e782553bc44 "pdflatex"
   (generated)
   "neurips_2024.bbl"
   "neurips_2024.blg"
   (rewritten before read)
-["pdflatex"] 1771807753.16038 "neurips_2024.tex" "neurips_2024.pdf" "neurips_2024" 1771807754.79391 0
+["pdflatex"] 1771810189.93924 "neurips_2024.tex" "neurips_2024.pdf" "neurips_2024" 1771810190.81966 0
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -35,6 +35,7 @@
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb" 1248133631 31809 8670ca339bf94e56da1fc21c80635e2a ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1248133631 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1248133631 32569 5e5ddc8df908dea60932f3c484a54c0d ""
+  "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb" 1248133631 32915 7bf7720c61a5b3a7ff25b0964421c9b6 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb" 1248133631 32716 08e384dc442464e7285e891af9f45947 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb" 1248133631 34694 ad62b13721ee8eda1dcc8993c8bd7041 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfit1000.pfb" 1215737283 157419 ef2add7d886ed65124e72477bd51c8f4 ""
@@ -127,11 +128,11 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1771618223 5467155 19efa205003f9ecad95fbbaa6ff24da1 ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1741450574 3345740 46b66fdb0378f7bf5921b5eabf1762b8 ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "neurips_2024.aux" 1771807754.38873 10574 2a203f9c04c182f2a8478939cbeeeb7c "pdflatex"
-  "neurips_2024.bbl" 1771807753.15723 10188 16c5008b0e0b2b0369475201a3a3ee88 "bibtex neurips_2024"
-  "neurips_2024.out" 1771807754.39015 5541 afb6e3125df559212bb00b010fce8cf3 "pdflatex"
+  "neurips_2024.aux" 1771810190.60605 10628 c6a8f30704af8c2856a10e782553bc44 "pdflatex"
+  "neurips_2024.bbl" 1771810189.93737 10188 16c5008b0e0b2b0369475201a3a3ee88 "bibtex neurips_2024"
+  "neurips_2024.out" 1771810190.60686 5639 4f5f2768a6c7f53f3e9df7eea6376eaf "pdflatex"
   "neurips_2024.sty" 1771807676.92788 11709 a9205d2da276e736f1a281963a9e3adc ""
-  "neurips_2024.tex" 1771807747.97946 35699 99fa55c143a52272ccbdaad11dfb3e21 ""
+  "neurips_2024.tex" 1771809934.85883 36580 5755b529b1bcf497869f57c89352a184 ""
   "neuroscience/src/pt_files/latent_manifold_mds.png" 1771799017.06202 135260 0d998e736796107c178d1456d41c43ea ""
   (generated)
   "neurips_2024.aux"
