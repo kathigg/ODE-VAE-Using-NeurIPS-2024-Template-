@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Neuroscience Runs Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__title">Neuroscience Runs Dashboard</div>
+      <div class="topbar__hint">
+        Serves local files from <code>neuroscience/runs</code>. Run a local server (see
+        <code>viz/README.md</code>).
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="panel__header">
+          <h2 class="panel__title">Runs</h2>
+          <button id="reloadBtn" class="btn" type="button">Reload</button>
+        </div>
+
+        <label class="field">
+          <span class="field__label">Filter</span>
+          <input id="filterInput" class="field__input" type="text" placeholder="Type a run id or note…" />
+        </label>
+
+        <select id="runSelect" class="runSelect" size="14" aria-label="Run list"></select>
+
+        <div id="status" class="status"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__header">
+          <h2 class="panel__title">Run Details</h2>
+        </div>
+        <div id="runDetails" class="details">
+          <div class="details__empty">Select a run to view details.</div>
+        </div>
+      </section>
+
+      <section class="panel panel--wide">
+        <div class="panel__header panel__header--wrap">
+          <h2 class="panel__title">Model + Objective (from <code>config.txt</code>)</h2>
+          <div class="status status--muted">
+            Pick a metric to highlight its corresponding term. This is a diagrammatic summary (not a computational graph).
+          </div>
+        </div>
+        <div id="modelDiagram" class="modelDiagram">(select a run)</div>
+      </section>
+
+      <section class="panel panel--wide">
+        <div class="panel__header panel__header--wrap">
+          <h2 class="panel__title">Learning Curves (from <code>run.log</code>)</h2>
+          <div class="controls" role="group" aria-label="Learning curve controls">
+            <button id="playBtn" class="btn" type="button">Play</button>
+            <button id="pauseBtn" class="btn" type="button" disabled>Pause</button>
+
+            <label class="field field--inline">
+              <span class="field__label">Speed</span>
+              <select id="speedSelect" class="field__select" aria-label="Playback speed">
+                <option value="1">1×</option>
+                <option value="2">2×</option>
+                <option value="5">5×</option>
+                <option value="10">10×</option>
+              </select>
+            </label>
+
+            <label class="field field--inline">
+              <span class="field__label">Epoch</span>
+              <input id="epochSlider" class="epochSlider" type="range" min="0" max="0" step="1" value="0" />
+              <span id="epochLabel" class="epochLabel">—</span>
+            </label>
+
+            <label class="field field--inline">
+              <span class="field__label">Metric</span>
+              <select id="metricSelect" class="field__select" aria-label="Metric">
+                <option value="valid.r2">valid R²</option>
+                <option value="valid.r">valid r</option>
+                <option value="valid.loss">valid loss</option>
+                <option value="train.loss">train loss</option>
+                <option value="train.recon">train recon</option>
+                <option value="train.kl">train KL</option>
+                <option value="train.smooth">train smooth</option>
+                <option value="train.trans">train trans</option>
+                <option value="train.lle">train lle</option>
+                <option value="train.beta">train beta</option>
+              </select>
+            </label>
+
+            <button id="recordBtn" class="btn" type="button">Record Video</button>
+            <button id="stopRecordBtn" class="btn" type="button" disabled>Stop</button>
+            <button id="snapshotBtn" class="btn" type="button">Snapshot PNG</button>
+            <span id="recordStatus" class="recordStatus" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="chartWrap">
+          <canvas id="curveCanvas" class="chart" width="1100" height="380"></canvas>
+          <div id="epochMetrics" class="epochMetrics"></div>
+          <div id="curveStatus" class="status status--muted"></div>
+        </div>
+      </section>
+
+      <section class="panel panel--wide">
+        <div class="panel__header">
+          <h2 class="panel__title">Loss Composition (approx., train)</h2>
+        </div>
+        <div class="chartWrap">
+          <canvas id="lossCanvas" class="chart" width="1100" height="320"></canvas>
+          <div id="lossStatus" class="status status--muted"></div>
+        </div>
+      </section>
+
+      <section class="panel panel--wide">
+        <div class="panel__header">
+          <h2 class="panel__title">Files</h2>
+          <div class="fileTabs" role="tablist" aria-label="Run file viewer">
+            <button class="tabBtn" id="tabRunJson" type="button" role="tab">run.json</button>
+            <button class="tabBtn" id="tabConfig" type="button" role="tab">config.txt</button>
+            <button class="tabBtn" id="tabConfigOrig" type="button" role="tab">config_original.txt</button>
+            <button class="tabBtn" id="tabRunLog" type="button" role="tab">run.log</button>
+            <button class="tabBtn" id="tabGitDiff" type="button" role="tab">git_diff.patch</button>
+          </div>
+        </div>
+        <pre id="fileViewer" class="fileViewer">(select a run to view files)</pre>
+      </section>
+
+      <section class="panel panel--wide">
+        <div class="panel__header">
+          <h2 class="panel__title">Artifacts</h2>
+        </div>
+        <div class="artifacts">
+          <figure class="artifact">
+            <img id="previewImg" class="artifact__img" alt="preview.png" />
+            <figcaption class="artifact__cap"><code>preview.png</code></figcaption>
+          </figure>
+          <figure class="artifact">
+            <img id="manifoldImg" class="artifact__img" alt="latent_manifold_mds.png" />
+            <figcaption class="artifact__cap"><code>latent_manifold_mds.png</code></figcaption>
+          </figure>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const el = document.getElementById("status");
+      if (el) el.textContent = "Loading runs…";
+
+      window.addEventListener("error", (e) => {
+        const s = document.getElementById("status");
+        if (!s) return;
+        s.textContent = `JavaScript error: ${e?.message ?? e}`;
+        s.style.color = "var(--danger)";
+      });
+      window.addEventListener("unhandledrejection", (e) => {
+        const s = document.getElementById("status");
+        if (!s) return;
+        s.textContent = `Unhandled promise rejection: ${e?.reason?.message ?? e?.reason ?? "unknown"}`;
+        s.style.color = "var(--danger)";
+      });
+    </script>
+    <script src="./app.js"></script>
+  </body>
+</html>
